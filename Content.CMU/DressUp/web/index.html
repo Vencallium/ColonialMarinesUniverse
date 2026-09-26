@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Create a CMU character and try on clothing from the game's prototype library. Rotate your character and export your look.">
+  <title>CMU · Dressing room</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23151c22'/%3E%3Cpath d='M9 8h5v5h4V8h5v17H9z' fill='%23b4d779'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="appearance.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <header><a class="brand" href="./"><span class="brand-mark">CMU</span><span>DRESSING ROOM<small>Colonial Marines Universe</small></span></a><span class="header-note">CHARACTER STUDIO <span>/</span> 01</span><button id="export" disabled>Export character ↗</button></header>
+  <main>
+    <aside class="appearance panel" aria-labelledby="appearance-title">
+      <div class="panel-heading"><span class="eyebrow">01 / IDENTITY</span><h1 id="appearance-title">Your character</h1></div>
+      <div class="fields">
+        <label>Character name<input id="name" maxlength="60" value="New marine" autocomplete="off"></label>
+        <div class="two-col"><label>Species<select id="species"><option>Human</option></select></label><label>Body<select id="body"><option value="m">Male</option><option value="f">Female</option></select></label></div>
+        <label class="color-row">Skin tone<input id="skin" type="color" value="#d7ab86"></label>
+        <label class="color-row">Eye color<input id="eyeColor" type="color" value="#587d86"></label>
+        <div class="divider"></div>
+        <div class="style-field"><span>Hair</span><select id="Hair" hidden aria-label="Hair"></select><button id="browse-hair" class="look-picker" aria-haspopup="dialog"><canvas width="32" height="32"></canvas><span>Browse hair styles</span></button></div>
+        <label class="color-row">Hair color<input id="hairColor" type="color" value="#543a2a"></label>
+        <div class="style-field"><span>Facial hair</span><select id="FacialHair" hidden aria-label="Facial hair"></select><button id="browse-facial" class="look-picker" aria-haspopup="dialog"><canvas width="32" height="32"></canvas><span>Browse facial hair</span></button></div>
+        <label class="color-row">Facial hair color<input id="facialColor" type="color" value="#543a2a"></label>
+        <div class="divider"></div>
+        <label>Undershirt<select id="UndergarmentTop"></select></label>
+        <label>Underwear<select id="UndergarmentBottom"></select></label>
+        <div class="divider"></div>
+        <section class="marking-section" aria-labelledby="markings-title"><h2 id="markings-title">Tattoos & markings</h2><button id="browse-markings" aria-haspopup="dialog">+ Add a marking</button><div id="chosen-markings"></div></section>
+      </div>
+      <p class="aside-note">Built from the game's original pixel art. Choose a slot, then pick something to wear.</p>
+    </aside>
+    <section class="studio" aria-labelledby="preview-name">
+      <div class="studio-heading"><span class="eyebrow">02 / FIT CHECK</span><span id="equipped-count">0 items equipped</span></div>
+      <div class="stage" id="stage" tabindex="0" role="group" aria-label="Character preview. Use left and right arrow keys or swipe to rotate.">
+        <span class="stage-cross top-left">+</span><span class="stage-cross top-right">+</span>
+        <div class="character-title"><h2 id="preview-name">New marine</h2><span>HUMAN <span class="dot">·</span> <span id="direction-label">FRONT</span></span></div>
+        <div class="platform"></div><canvas id="character" width="96" height="96" aria-label="Your dressed character"></canvas>
+        <span class="stage-cross bottom-left">+</span><span class="stage-cross bottom-right">+</span>
+        <div class="rotate"><button id="rotate-left" aria-label="Rotate character left">↶</button><span id="facing">SOUTH</span><button id="rotate-right" aria-label="Rotate character right">↷</button></div>
+      </div>
+      <div class="preview-tools"><span>Drag to turn <span class="dot">·</span> ← →</span><label>Zoom <input id="zoom" type="range" min="3" max="7" value="5" step="1"></label></div>
+      <div class="lighting-controls"><label>Lighting<select id="lighting"><option value="full">Full bright</option><option value="natural">Natural daylight</option><option value="indoor">Warm indoor</option><option value="night">Night</option><option value="emergency">Emergency red</option></select></label><label>Brightness <output id="brightness-value" for="brightness">100%</output><input id="brightness" type="range" min="25" max="150" value="100" step="5"></label><p>Preview lighting also applies to exported images.</p></div>
+      <div class="equipment-heading"><h2>Equipment</h2><button id="clear" class="text-button">Clear outfit</button></div>
+      <div id="equipment" class="equipment"></div>
+    </section>
+    <section class="wardrobe panel" aria-labelledby="wardrobe-title">
+      <div class="panel-heading"><span class="eyebrow">03 / WARDROBE</span><div class="heading-row"><h2 id="wardrobe-title">Uniform</h2><span id="result-count" class="count"></span></div></div>
+      <div class="catalog-controls"><label class="search-label"><span class="sr-only">Search clothing, weapons, or prototype IDs</span><input id="search" type="search" placeholder="Search clothing & weapons…" autocomplete="off"></label><label class="source-label">Search in<select id="search-scope"><option value="all">All slots</option><option value="slot">Selected slot</option></select></label><label class="source-label">Collection<select id="collection"><option value="all">All collections</option><option value="CMU">CMU</option><option value="RMC">RMC14</option><option value="SS14">SS14</option></select></label></div>
+      <div id="catalog" class="catalog" aria-label="Available clothing"></div>
+      <div class="pagination"><button id="previous" aria-label="Previous page">←</button><span id="page-label"></span><button id="next" aria-label="Next page">→</button></div>
+      <div id="item-detail" class="item-detail">Select an item to equip it.</div>
+    </section>
+  </main>
+  <dialog id="appearance-dialog" aria-labelledby="picker-title"><div class="dialog-heading"><div><span class="eyebrow">APPEARANCE LIBRARY</span><h2 id="picker-title">Hair styles</h2></div><button id="close-picker" aria-label="Close appearance picker">✕</button></div><div class="picker-controls"><label>Search styles<input id="appearance-search" type="search" placeholder="Search by name…"></label><label id="marking-part-label">Body part<select id="marking-part"><option value="all">All body parts</option></select></label><label>Preview angle<select id="picker-angle"><option value="0">Front</option><option value="2">Left side</option><option value="1">Back</option><option value="3">Right side</option></select></label></div><p id="picker-hint">Choose a style to apply it.</p><div id="appearance-options" class="appearance-options"></div><div class="pagination"><button id="picker-previous" aria-label="Previous styles">←</button><span id="picker-page"></span><button id="picker-next" aria-label="Next styles">→</button></div></dialog>
+  <footer><span id="status" role="status">Loading the wardrobe…</span><a href="credits.html">Sprite credits & licenses ↗</a></footer>
+</body>
+</html>

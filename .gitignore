@@ -330,4 +330,7 @@ settings.local.json
 # personal agent configs
 AGENTS.md
 CLAUDE.md
+# CMU14: local dressing-room build dependencies and visual checks.
+/.codex-build/dressup-deps/
+/.codex-build/dressup-*.png
 Content.CMU/Resources/Prototypes/CMU14/Entities/Structures/Atmos/exhaust_vents.yml
