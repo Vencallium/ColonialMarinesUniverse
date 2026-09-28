@@ -81,7 +81,7 @@ public class CMUReconstructionBui(EntityUid owner, Enum uiKey) : RMCPopOutBui<Ta
         _actor = PlayerManager.LocalEntity;
         if (!_classic)
         {
-            _window = this.CreateWindow<CMUReconstructionWindow>();
+            _window = this.CreatePopOutableWindow<CMUReconstructionWindow>();
             var cache = EntMan.System<CMUReconstructionCacheSystem>();
             _window.LoadView = cache.GetView;
             _window.SaveView = cache.SaveView;
@@ -113,7 +113,7 @@ public class CMUReconstructionBui(EntityUid owner, Enum uiKey) : RMCPopOutBui<Ta
             _window.OnSend += SendMessage;
             _window.OnCancelOrder += SendMessage;
             _window.OnClear += () => SendMessage(new CMUReconClearOrdersMessage());
-            _window.OnClose += () => { StopSurveyRetry(); CloseCamera(); };
+            _window.OnFinalClose += () => { StopSurveyRetry(); CloseCamera(); };
             _window.OnClosing += Remember;
             _window.OnMapSelected += SelectMap;
             _window.OnLayerSelected += message =>
@@ -222,6 +222,7 @@ public class CMUReconstructionBui(EntityUid owner, Enum uiKey) : RMCPopOutBui<Ta
             CloseCamera();
             Remember();
             StopSurveyRetry();
+            _window?.DisposePopOut();
         }
         base.Dispose(disposing);
     }

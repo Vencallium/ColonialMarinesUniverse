@@ -192,7 +192,7 @@ cmu-fighter-air-countdown = Impact in { $seconds }s
 cmu-fighter-flares = DEPLOY FLARES
 cmu-fighter-flares-used = FLARES DEPLOYED
 cmu-fighter-flares-pilot = PILOT MUST DEPLOY FLARES
-cmu-fighter-flares-chance = One attempt per incoming missile · { $chance }% evasion chance. A hit forces a retreat.
+cmu-fighter-flares-chance = One attempt per incoming missile · { $chance }% evasion chance. Early flares and higher speed improve evasion. A hit forces a retreat.
 cmu-fighter-air-evaded = MISSILE EVADED
 cmu-fighter-air-continue = Aircraft intact · continue the mission
 cmu-fighter-air-hit = AIRCRAFT HIT
@@ -286,3 +286,7 @@ cmu-fighter-flares-idle = Countermeasures become available when a missile is app
 ent-CMUFighterGroundLoaded = two-seat VTOL fighter
     .desc = A strike and reconnaissance fighter supplied with six different missiles and a full internal GAU ammunition feed. Service its weapons on the ground with a power loader.
     .suffix = Fully equipped, mixed missiles
+
+cmu-fighter-crash-warning = AIRFRAME FAILURE — EJECT! Impact in { $seconds } seconds!
+cmu-fighter-crashed = AIRFRAME LOST — Aircraft cannot be repaired.
+cmu-fighter-exit-blocked = There is no clear footing beside the cockpit to climb out.

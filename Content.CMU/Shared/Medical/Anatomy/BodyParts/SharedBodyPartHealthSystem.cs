@@ -44,6 +44,7 @@ public abstract partial class SharedBodyPartHealthSystem : EntitySystem
     private bool _medicalEnabled;
     private bool _bodyPartEnabled;
     private float _bodyPartDamagePropagation;
+    private float _explosionLimbSeveranceMultiplier;
     private bool _severanceHeadDisabled;
     private bool _severanceTorsoDisabled;
 
@@ -59,6 +60,8 @@ public abstract partial class SharedBodyPartHealthSystem : EntitySystem
         Cfg.OnValueChanged(CMUMedicalCCVars.Enabled, v => _medicalEnabled = v, true);
         Cfg.OnValueChanged(CMUMedicalCCVars.BodyPartEnabled, v => _bodyPartEnabled = v, true);
         Cfg.OnValueChanged(CMUMedicalCCVars.BodyPartDamagePropagation, v => _bodyPartDamagePropagation = v, true);
+        Cfg.OnValueChanged(CMUMedicalCCVars.ExplosionLimbSeveranceMultiplier,
+            v => _explosionLimbSeveranceMultiplier = MathF.Max(0f, v), true);
         Cfg.OnValueChanged(CMUMedicalCCVars.SeveranceHeadDisabled, v => _severanceHeadDisabled = v, true);
         Cfg.OnValueChanged(CMUMedicalCCVars.SeveranceTorsoDisabled, v => _severanceTorsoDisabled = v, true);
     }
@@ -324,6 +327,12 @@ public abstract partial class SharedBodyPartHealthSystem : EntitySystem
         var severanceDeduction = canAccumulateSeverance
             ? DamageImpactSeverance.Calculate(modified, impact) * (FixedPoint2)_bodyPartDamagePropagation
             : FixedPoint2.Zero;
+
+        // Blast damage is spread across the whole body. Increase its ability to sever
+        // exposed limbs without multiplying health damage or changing head/torso rules.
+        if (impact.Delivery == DamageImpactDelivery.Explosion &&
+            partType is BodyPartType.Arm or BodyPartType.Hand or BodyPartType.Leg or BodyPartType.Foot)
+            severanceDeduction *= (FixedPoint2)_explosionLimbSeveranceMultiplier;
 
         health.Current -= deduction;
         if (severanceDeduction > FixedPoint2.Zero)

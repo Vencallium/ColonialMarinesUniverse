@@ -771,17 +771,21 @@ public sealed partial class CMUZLevelsSystem
         }
 
         var lowerDepth = Math.Min(_maxRenderDepth, MaxZLevelsBelowRendering);
+        var checkingMap = map;
 
         for (var i = 1; i <= lowerDepth && remainingProbes > 0; i++)
         {
-            if (!TryMapOffset(map, -i, out _))
+            if (!TryMapOffset(map, -i, out var lowerMap))
                 break;
 
-            if (!HasZOpeningPath(map, globalPos, -i, requireVisibleFirstStep: true))
+            // Earlier steps have already succeeded during this refresh. Only the viewer's own
+            // floor needs the expensive visible-aperture search; check each lower floor once.
+            if (!HasZOpeningPath(checkingMap, globalPos, -1, requireVisibleFirstStep: i == 1))
                 break;
 
             depths.Add(-i);
             remainingProbes--;
+            checkingMap = lowerMap.Value;
         }
 
         if (remainingProbes <= 0)
@@ -881,7 +885,9 @@ public sealed partial class CMUZLevelsSystem
                             _profilePvsStairLosChecks++;
                         }
 
-                        if (_examine.InRangeUnOccluded(origin, target, range, ent => ent == viewer.Owner || ent == highGroundUid))
+                        if (_examine.InRangeUnOccluded(origin, target, range,
+                                (Viewer: viewer.Owner, HighGround: highGroundUid),
+                                static (ent, state) => ent == state.Viewer || ent == state.HighGround))
                         {
                             if (previewPositions.Count < CMUZLevelViewerComponent.MaxStairPreviewPositions)
                                 AddStairPreviewPosition(previewPositions, target.Position);

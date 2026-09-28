@@ -60,6 +60,9 @@ public sealed partial class ExplosionSystem : SharedExplosionSystem
     [Dependency] private FlammableSystem _flammableSystem = default!;
     [Dependency] private DestructibleSystem _destructibleSystem = default!;
     [Dependency] private AtmosphereSystem _atmosphere = default!;
+    // cmu edit start
+    [Dependency] private Content.Server.CMU14.Explosion.CMUGrenadeBodyBlockSystem _cmuGrenadeBodyBlock = default!;
+    // cmu edit end
 
     [Dependency] private EntityQuery<FlammableComponent> _flammableQuery = default!;
     [Dependency] private EntityQuery<PhysicsComponent> _physicsQuery = default!;
@@ -162,6 +165,20 @@ public sealed partial class ExplosionSystem : SharedExplosionSystem
         if (radius != null)
             totalIntensity ??= RadiusToIntensity((float)radius, explosive.IntensitySlope, explosive.MaxIntensity);
         totalIntensity ??= explosive.TotalIntensity;
+
+        // cmu edit start
+        _cmuGrenadeBodyBlock.TrySeverHoldingHand(uid);
+        if (_cmuGrenadeBodyBlock.TryAbsorbBlast(uid,
+                explosive.ExplosionType,
+                (float) totalIntensity,
+                explosive.IntensitySlope,
+                explosive.MaxIntensity))
+        {
+            if (explosive.DeleteAfterExplosion ?? delete)
+                QueueDel(uid);
+            return;
+        }
+        // cmu edit end
 
         QueueExplosion(uid,
             explosive.ExplosionType,
@@ -374,6 +391,11 @@ public sealed partial class ExplosionSystem : SharedExplosionSystem
             : queued.Proto.Sound;
 
         _audio.PlayStatic(sound, filter, mapEntityCoords, true, sound.Params);
+
+        // cmu edit start
+        var cmuExplosionEv = new Content.Server.CMU14.Hearing.CMUExplosionSpawnedEvent(pos, iterationIntensity.Count);
+        RaiseLocalEvent(ref cmuExplosionEv);
+        // cmu edit end
 
         // play far sound
         // far sound should play for anyone who wasn't in range of any of the effects of the bomb

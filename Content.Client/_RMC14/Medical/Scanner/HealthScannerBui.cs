@@ -159,6 +159,14 @@ public sealed partial class HealthScannerBui : BoundUserInterface
             _window.HealthBarText.Text = Loc.GetString("rmc-health-analyzer-healthy", ("percent", "100%"));
         }
 
+        // cmu edit start
+        if (!isPermaDead && uiState.CMUTimeUntilUnrevivable is { } untilUnrevivable)
+        {
+            var minutes = Math.Max(1, (int) Math.Ceiling(untilUnrevivable.TotalMinutes));
+            _window.HealthBarText.Text += " " + Loc.GetString("cmu-health-analyzer-time-until-unrevivable", ("minutes", minutes));
+        }
+        // cmu edit end
+
         _window.ChangeHolocardButton.Text = Loc.GetString("ui-health-scanner-holocard-change");
         if (_player.LocalEntity is { } viewer &&
             _skills.HasSkill(viewer, HolocardSystem.SkillType, HolocardSystem.MinimumRequiredSkill))

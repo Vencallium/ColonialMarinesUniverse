@@ -63,7 +63,8 @@ public sealed partial class HardpointSlotsComponent : Component
     public List<HardpointSlot> Slots = new();
 
     [DataField]
-    public float FrameDamageFractionWhileIntact = 0.25f;
+    // CMU14: vehicle damage and conscious controls.
+    public float FrameDamageFractionWhileIntact = 0.5f;
 
     /// <summary>Fraction of a direct hit that can reach one additional module.</summary>
     [DataField]
@@ -257,9 +258,11 @@ public sealed partial class HardpointRemoveDoAfterEvent : DoAfterEvent
 [Serializable, NetSerializable]
 public sealed partial class HardpointRepairDoAfterEvent : DoAfterEvent
 {
+    public float RepairAmount;
+
     public override DoAfterEvent Clone()
     {
-        return new HardpointRepairDoAfterEvent();
+        return new HardpointRepairDoAfterEvent { RepairAmount = RepairAmount };
     }
 }
 

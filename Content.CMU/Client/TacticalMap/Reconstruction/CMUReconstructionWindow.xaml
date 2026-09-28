@@ -1,8 +1,8 @@
-<DefaultWindow xmlns="https://spacestation14.io"
+<recon:CMUReconstructionWindow xmlns="https://spacestation14.io"
                xmlns:recon="clr-namespace:Content.Client.CMU14.TacticalMap.Reconstruction"
                xmlns:gfx="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
                Title="{Loc cmu-recon-title}" MinSize="680 420" SetSize="1280 820">
-  <PanelContainer>
+  <PanelContainer Name="ContentPanel">
     <PanelContainer.PanelOverride>
       <gfx:StyleBoxFlat BackgroundColor="#0B141D" BorderColor="#304751" BorderThickness="1" />
     </PanelContainer.PanelOverride>
@@ -58,4 +58,4 @@
       <RichTextLabel Name="Status" Text="{Loc cmu-recon-loading}" />
     </BoxContainer>
   </PanelContainer>
-</DefaultWindow>
+</recon:CMUReconstructionWindow>

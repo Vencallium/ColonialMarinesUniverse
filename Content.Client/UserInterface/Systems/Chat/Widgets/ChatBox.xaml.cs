@@ -1,3 +1,6 @@
+// cmu edit start
+using System.Text.RegularExpressions;
+// cmu edit end
 using System;
 using System.Linq;
 using Content.Client._CMU14.Interface;
@@ -214,7 +217,28 @@ public partial class ChatBox : UIWidget
 
     private void OnTextEntered(LineEditEventArgs args)
     {
+        // cmu edit start
+        var sentOn = SelectedChannel;
+        var hadText = !string.IsNullOrWhiteSpace(args.Text);
+        // cmu edit end
+
         _controller.SendMessage(this, SelectedChannel);
+
+        // cmu edit start
+        // Snap back to Local after talking on another channel, or to Dead chat as a ghost.
+        var home = (_controller.SelectableChannels & ChatSelectChannel.Local) != 0
+            ? ChatSelectChannel.Local
+            : (_controller.SelectableChannels & ChatSelectChannel.Dead) != 0
+                ? ChatSelectChannel.Dead
+                : ChatSelectChannel.None;
+        if (hadText &&
+            home != ChatSelectChannel.None &&
+            sentOn != home &&
+            IoCManager.Resolve<IConfigurationManager>().GetCVar(CCVars.ChatResetToLocal))
+        {
+            ChatInput.ChannelSelector.Select(home);
+        }
+        // cmu edit end
     }
 
     private void OnMessageAdded(ChatMessage msg)
@@ -1371,6 +1395,10 @@ public partial class ChatBox : UIWidget
         markup = _colorWholeMessage
             ? ChatUserSettings.ApplyStyleMarkup(markup, style, ChatUserSettings.DefaultFontSize)
             : ChatUserSettings.ApplyFontMarkup(RemoveOuterColorMarkup(markup), style, ChatUserSettings.DefaultFontSize);
+        // cmu edit start
+        if (_colorWholeMessage && message.Channel == ChatChannel.Emotes)
+            markup = ColorEmoteSpeech(markup, LocalSpeechColor());
+        // cmu edit end
 
         var formatted = new FormattedMessage(3);
         if (_colorWholeMessage)
@@ -1407,6 +1435,32 @@ public partial class ChatBox : UIWidget
         return markup;
     }
 
+    // cmu edit start
+    // Quoted speech inside an emote arrives as [font="X"]"..."[/font]; give it the Local chat colour.
+    private static readonly Regex EmoteSpeechOpen = new(@"\[font=""[^""\]]*""\]""");
+    private static readonly Regex EmoteSpeechClose = new(@"""\[/font\]");
+
+    private static string ColorEmoteSpeech(string markup, Color color)
+    {
+        var opens = EmoteSpeechOpen.Matches(markup).Count;
+        if (opens == 0 || opens != EmoteSpeechClose.Matches(markup).Count)
+            return markup;
+
+        var hex = color.ToHex();
+        markup = EmoteSpeechOpen.Replace(markup, match => $"[color={hex}]{match.Value}");
+        return EmoteSpeechClose.Replace(markup, match => $"{match.Value}[/color]");
+    }
+
+    private Color LocalSpeechColor()
+    {
+        var key = ChatUserSettings.ChannelKey(ChatChannel.Local);
+        var style = _styles.FirstOrDefault(s => string.Equals(s.Target, key, StringComparison.OrdinalIgnoreCase));
+        return ChatUserSettings.ResolveColor(style) ??
+               ChatUserSettings.CrtChannelColor(ChatChannel.Local) ??
+               ChatChannel.Local.TextColor();
+    }
+    // cmu edit end
+
     private static string RemoveOuterColorMarkup(string markup)
     {
         if (!markup.StartsWith("[color=", StringComparison.OrdinalIgnoreCase) ||
@@ -1431,7 +1485,12 @@ public partial class ChatBox : UIWidget
         if (!string.IsNullOrWhiteSpace(message.LanguageIcon))
             AddChatMarkup(formatted, $"[langicon language=\"{FormattedMessage.EscapeStringParameter(message.LanguageIcon)}\"][/langicon]", message.Channel);
         // RMC14
-        AddChatMarkup(formatted, message.WrappedMessage.TrimEnd(), message.Channel);
+        // cmu edit start
+        var legacyMarkup = message.WrappedMessage.TrimEnd();
+        if (message.Channel == ChatChannel.Emotes)
+            legacyMarkup = ColorEmoteSpeech(legacyMarkup, ChatChannel.Local.TextColor());
+        AddChatMarkup(formatted, legacyMarkup, message.Channel);
+        // cmu edit end
 
         formatted.Pop();
 
@@ -1596,6 +1655,9 @@ public partial class ChatBox : UIWidget
         if (channel != null)
             ChatInput.ChannelSelector.Select(channel.Value);
 
+        // cmu edit start
+        CMUCenterInput();
+        // cmu edit end
         input.IgnoreNext = true;
         input.GrabKeyboardFocus();
 
@@ -1668,6 +1730,9 @@ public partial class ChatBox : UIWidget
     {
         // Warn typing indicator about focus
         _controller.NotifyChatFocus(false);
+        // cmu edit start
+        CMURestoreInput();
+        // cmu edit end
     }
 
     // Does not run on the normal path: screens are cached in UserInterfaceManager and UnloadScreen

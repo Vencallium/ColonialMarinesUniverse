@@ -252,6 +252,17 @@ public abstract partial class SharedRMCDamageableSystem : EntitySystem
             return;
 
         var modifyTotal = args.Damage.GetTotal();
+        // Structural blast damage cannot consume a human's remaining damage budget.
+        // Injurable discards unsupported types when committing the damage.
+        if (TryComp<InjurableComponent>(ent, out var injurable))
+        {
+            modifyTotal = FixedPoint2.Zero;
+            foreach (var (type, amount) in args.Damage.DamageDict)
+            {
+                if (_damageable.CanBeDamagedBy((ent.Owner, injurable), type))
+                    modifyTotal += amount;
+            }
+        }
         var totalDamage = _damageable.GetTotalDamage((ent.Owner, damageable));
         if (modifyTotal <= FixedPoint2.Zero || totalDamage + modifyTotal <= ent.Comp.Max)
             return;

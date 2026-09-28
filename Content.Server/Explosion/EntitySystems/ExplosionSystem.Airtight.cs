@@ -313,6 +313,12 @@ public sealed partial class ExplosionSystem
         FixedPoint2 damagePerIntensity,
         SortedDictionary<FixedPoint2, FixedPoint2> damageThresholds)
     {
+        // A blocker can already be past its destruction threshold while deletion is queued.
+        // Negative tolerance would schedule tiles into previous flood iterations, mutating
+        // the collections currently being enumerated.
+        if (damageTarget <= FixedPoint2.Zero)
+            return FixedPoint2.Zero;
+
         var tolerance = damagePerIntensity > 0 ? damageTarget / damagePerIntensity : ToleranceValues.Invulnerable;
         var prevIntensity = FixedPoint2.Zero;
         /*

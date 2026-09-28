@@ -60,6 +60,79 @@ public sealed partial class GridVehicleMoverSystem : EntitySystem
         bool IsVehicle,
         bool IsUnpoweredDoor);
 
+    // Occupancy checks can recurse while handling a collision. Match the separate
+    // hit buffers so a nested check cannot replace the outer pass's sort keys.
+    private readonly CollisionHitSortBuffer[] _collisionHitSortBuffers = { new(), new(), new() };
+    private Func<EntityUid, Box2>? _collisionSortBounds;
+
+    private Box2 GetCollisionSortBounds(EntityUid uid) => lookup.GetWorldAABB(uid);
+
+    private sealed class CollisionHitSortBuffer
+    {
+        private readonly List<CollisionSortKey> _keys = new();
+
+        public void Sort(
+            List<EntityUid> hits,
+            Vector2 movementStart,
+            Vector2 movementTarget,
+            Vector2 movementHalfExtents,
+            Func<EntityUid, Box2> getBounds)
+        {
+            _keys.Clear();
+            if (hits.Count < 2)
+                return;
+
+            // Bounds and sweep calculations are per candidate, not per comparison.
+            // These keys only decide order; the effects loop rebuilds each collision
+            // candidate after earlier contacts may have moved or destroyed entities.
+            foreach (var hit in hits)
+            {
+                var bounds = getBounds(hit);
+                _keys.Add(new CollisionSortKey(
+                    hit,
+                    bounds,
+                    ImpactEnergySolver.GetSweptAabbContactTime(
+                        movementStart,
+                        movementTarget,
+                        movementHalfExtents,
+                        bounds),
+                    ImpactEnergySolver.GetContactOrder(movementStart, movementTarget, bounds.Center)));
+            }
+
+            _keys.Sort();
+            for (var i = 0; i < hits.Count; i++)
+                hits[i] = _keys[i].Entity;
+        }
+    }
+
+    private readonly record struct CollisionSortKey(
+        EntityUid Entity,
+        Box2 Bounds,
+        float ContactTime,
+        float ContactOrder) : IComparable<CollisionSortKey>
+    {
+        public int CompareTo(CollisionSortKey other)
+        {
+            var order = ContactTime.CompareTo(other.ContactTime);
+            if (order != 0)
+                return order;
+            order = ContactOrder.CompareTo(other.ContactOrder);
+            if (order != 0)
+                return order;
+            order = Bounds.Left.CompareTo(other.Bounds.Left);
+            if (order != 0)
+                return order;
+            order = Bounds.Bottom.CompareTo(other.Bounds.Bottom);
+            if (order != 0)
+                return order;
+            order = Bounds.Right.CompareTo(other.Bounds.Right);
+            if (order != 0)
+                return order;
+            order = Bounds.Top.CompareTo(other.Bounds.Top);
+            return order != 0 ? order : Entity.Id.CompareTo(other.Entity.Id);
+        }
+    }
+
     private bool CanOccupyTransform(
         EntityUid uid,
         GridVehicleMoverComponent mover,
@@ -114,7 +187,8 @@ public sealed partial class GridVehicleMoverSystem : EntitySystem
             fixtureBounds,
             _intersectingPhysics,
             LookupFlags.Dynamic | LookupFlags.Static);
-        var hits = _hitsBuffers[_hitsDepth++];
+        var hitsDepth = _hitsDepth++;
+        var hits = _hitsBuffers[hitsDepth];
         hits.Clear();
         foreach (var hit in _intersectingPhysics)
         {
@@ -122,41 +196,12 @@ public sealed partial class GridVehicleMoverSystem : EntitySystem
         }
         var movementStart = transform.GetWorldPosition(uid);
         var movementHalfExtents = aabb.Size * 0.5f;
-        hits.Sort((left, right) =>
-        {
-            var leftBounds = lookup.GetWorldAABB(left);
-            var rightBounds = lookup.GetWorldAABB(right);
-            var leftTime = ImpactEnergySolver.GetSweptAabbContactTime(
-                movementStart,
-                tx.Position,
-                movementHalfExtents,
-                leftBounds);
-            var rightTime = ImpactEnergySolver.GetSweptAabbContactTime(
-                movementStart,
-                tx.Position,
-                movementHalfExtents,
-                rightBounds);
-            var order = leftTime.CompareTo(rightTime);
-            if (order != 0)
-                return order;
-
-            var leftOrder = ImpactEnergySolver.GetContactOrder(movementStart, tx.Position, leftBounds.Center);
-            var rightOrder = ImpactEnergySolver.GetContactOrder(movementStart, tx.Position, rightBounds.Center);
-            order = leftOrder.CompareTo(rightOrder);
-            if (order != 0)
-                return order;
-            order = leftBounds.Left.CompareTo(rightBounds.Left);
-            if (order != 0)
-                return order;
-            order = leftBounds.Bottom.CompareTo(rightBounds.Bottom);
-            if (order != 0)
-                return order;
-            order = leftBounds.Right.CompareTo(rightBounds.Right);
-            if (order != 0)
-                return order;
-            order = leftBounds.Top.CompareTo(rightBounds.Top);
-            return order != 0 ? order : left.Id.CompareTo(right.Id);
-        });
+        _collisionHitSortBuffers[hitsDepth].Sort(
+            hits,
+            movementStart,
+            tx.Position,
+            movementHalfExtents,
+            _collisionSortBounds ??= GetCollisionSortBounds);
         var playedCollisionSound = false;
         var mobHits = new ValueList<EntityUid>(0);
 
@@ -692,8 +737,9 @@ public sealed partial class GridVehicleMoverSystem : EntitySystem
     /// <summary>
     /// Applies the heavy-smash tread + hull integrity damage to the vehicle. Called for both
     /// hard-wall smashes and vehicle-smashable passes (windows/shutters/doors/etc.).
-    /// Charges self-damage once per substantial impact. Heavy vehicles only take
-    /// damage from reinforced obstacles, and must move clear before another impact.
+    // CMU14: vehicle damage and conscious controls.
+    /// Charges self-damage once per substantial impact. Vehicles must move clear
+    /// before the same obstacle can charge another impact.
     /// <paramref name="targetDamageMultiplier"/> scales the vehicle's self-damage — set below 1
     /// for softer targets (e.g. resin walls) so they're cheaper to plow through.
     /// </summary>
@@ -722,13 +768,6 @@ public sealed partial class GridVehicleMoverSystem : EntitySystem
     {
         if (_net.IsClient || (wheelDamage <= 0f && hullDamage <= 0f) ||
             MathF.Abs(mover.CurrentSpeed) < MathF.Max(mover.CollisionDamageMinSpeed, mover.WallSmashMinSpeed))
-            return;
-
-        if (_tag.HasTag(vehicle, VehicleHeavyTag) && !HasComp<VehicleReinforcedObstacleComponent>(target))
-            return;
-
-        if (mover.IgnoreLightObstacleDamage && HasComp<VehicleSmashableComponent>(target) &&
-            !HasComp<VehicleReinforcedObstacleComponent>(target))
             return;
 
         if (!fixtureQ.TryComp(vehicle, out var vehicleFixtures) ||

@@ -135,6 +135,7 @@ public sealed partial class DropshipSystem : SharedDropshipSystem
         SubscribeLocalEvent<DropshipInFlyByComponent, FTLCompletedEvent>(OnInFlyByFTLCompleted);
         SubscribeLocalEvent<ThirdPartyDropshipDeactivatedConsoleComponent, InteractHandEvent>(OnDeactivatedThirdPartyConsoleInteract);
 
+        SubscribeLocalEvent<DropshipDestinationComponent, MapInitEvent>(OnForceOnForceDestinationMapInit); // CMU14
         SubscribeLocalEvent<DropshipDestinationComponent, DropshipRelayedEvent<FTLStartedEvent>>(OnDepartureLocationFTLStarted);
         SubscribeLocalEvent<DropshipDestinationComponent, DropshipRelayedEvent<FTLCompletedEvent>>(OnDestinationLocationFTLCompleted);
         SubscribeLocalEvent<DropshipDestinationComponent, DropshipRelayedEvent<FTLUpdatedEvent>>(OnDestinationLocationFTLUpdated);
@@ -149,6 +150,7 @@ public sealed partial class DropshipSystem : SharedDropshipSystem
             });
 
         SubscribeLocalEvent<WithdrawFactionHijackLockEvent>(OnWithdrawHijackLock);
+        SubscribeLocalEvent<Content.Shared._RMC14.WeedKiller.WeedKillerDeployAttemptEvent>(OnForceOnForceWeedKillerAttempt);
 
         Subs.CVar(_config, RMCCVars.RMCLandingZonePrimaryAutoMinutes, v => _lzPrimaryAutoDelay = TimeSpan.FromMinutes(v), true);
         Subs.CVar(_config, RMCCVars.RMCDropshipFlyByTimeSeconds, v => _flyByTime = TimeSpan.FromSeconds(v), true);
@@ -172,6 +174,10 @@ public sealed partial class DropshipSystem : SharedDropshipSystem
 
         RelayToMountedEntities(ent, args);
         RelayToDropshipDepartureLocation(ent, args);
+
+// CMU14: Force on Force roles, hijacking, announcements and identification.
+
+        AnnounceForceOnForceBoarders(ent);
 
         if (ent.Comp.HijackLandAt == null) // TODO RMC14: Check friendliness of xenos onboard.
         {
@@ -539,6 +545,20 @@ public sealed partial class DropshipSystem : SharedDropshipSystem
     // CMU14 method: validate and place the deck assembly before committing flight.
     public override bool FlyTo(Entity<DropshipNavigationComputerComponent> computer, EntityUid destination, EntityUid? user, bool hijack = false, float? startupTime = null, float? hyperspaceTime = null, bool offset = false)
     {
+        // CMU14: Force on Force roles, hijacking, announcements and identification.
+        if (!hijack && user is { } actor && !CanUseNavigation(computer, actor))
+        {
+            _popup.PopupEntity(Loc.GetString("cmu-dropship-navigation-access-denied"), computer, actor);
+            return false;
+        }
+
+        if (!hijack && !CanLandAt(computer, destination))
+        {
+            if (user is { } pilot)
+                _popup.PopupEntity(Loc.GetString("cmu-fof-dropship-wrong-faction"), computer, pilot);
+            return false;
+        }
+
         if (TryComp(computer.Owner, out WhitelistedShuttleComponent? whitelistComp) &&
             IsStrictThirdPartyFaction(whitelistComp.Faction) &&
             TryComp(destination, out DropshipDestinationComponent? destinationComp) &&
@@ -743,7 +763,15 @@ public sealed partial class DropshipSystem : SharedDropshipSystem
             RaiseLocalEvent(dropshipId.Value, ref hijackFlight);
         }
 
+        RemComp<Content.Server.CMU14.ForceOnForce.ForceOnForceLaunchComponent>(dropshipId.Value);
+        var coordinated = TryGetForceOnForceLaunchWindow(computer, destination, hijack,
+            out var opposingFaction, out var departureAt, out var newLaunchWindow);
+        if (coordinated)
+            startupTime = (float) (departureAt - _timing.CurTime).TotalSeconds;
+
         _shuttle.FTLToCoordinates(dropshipId.Value, shuttleComp, destCoords, rotation, startupTime: startupTime, hyperspaceTime: hyperspaceTime);
+        if (coordinated)
+            FinishForceOnForceLaunchWindow(dropshipId.Value, departureAt, opposingFaction, newLaunchWindow);
         if (reroutingFromTacticalHover)
             _tacticalLand.EndTacticalHoverForReroute(dropshipId.Value);
         ResetThirdPartyAutoReturnCountdown(dropshipId.Value);
@@ -752,7 +780,9 @@ public sealed partial class DropshipSystem : SharedDropshipSystem
         {
             if (user != null)
             {
-                var isHumanHijacker = TryComp<DropshipHijackerComponent>(user.Value, out var hijackerComp) && hijackerComp.IsHumanHijacker;
+                // CMU14: Force on Force roles, hijacking, announcements and identification.
+                var forceOnForce = IsForceOnForceHijacker(computer, user.Value);
+                var isHumanHijacker = !forceOnForce && TryComp<DropshipHijackerComponent>(user.Value, out var hijackerComp) && hijackerComp.IsHumanHijacker;
 
                 // Set Crashed on server-side for xeno hijack so OnFTLCompleted and
                 // the Update crash-effects loop can reliably detect it.
@@ -763,7 +793,8 @@ public sealed partial class DropshipSystem : SharedDropshipSystem
 
                 // Store hijack info on the dropship for use when FTL completes
                 dropship.IsHumanHijack = isHumanHijacker;
-                if (isHumanHijacker && TryComp<MarineComponent>(user.Value, out var hijackerMarine) && !string.IsNullOrEmpty(hijackerMarine.Faction))
+                // CMU14: Force on Force roles, hijacking, announcements and identification.
+                if ((isHumanHijacker || forceOnForce) && TryComp<MarineComponent>(user.Value, out var hijackerMarine) && !string.IsNullOrEmpty(hijackerMarine.Faction))
                     dropship.HijackerFaction = hijackerMarine.Faction;
                 else if (!isHumanHijacker)
                     dropship.HijackerFaction = null; // xeno hijack
@@ -800,7 +831,8 @@ public sealed partial class DropshipSystem : SharedDropshipSystem
 
                 dropship.VictimFaction = victimFaction;
 
-                if (isHumanHijacker)
+                // CMU14: Force on Force roles, hijacking, announcements and identification.
+                if (isHumanHijacker || forceOnForce)
                 {
                     // Human faction hijack announcements
                     var marineText = Loc.GetString("rmc-announcement-dropship-hijack-human");
@@ -831,6 +863,13 @@ public sealed partial class DropshipSystem : SharedDropshipSystem
             // Add 10 seconds to compensate for the arriving times
             dropship.HijackLandAt = _timing.CurTime + TimeSpan.FromSeconds(hyperspaceTime.Value) + TimeSpan.FromSeconds(10);
             Dirty(dropshipId.Value, dropship);
+
+            // CMU14: offer both factions a choice only after the hijack flight is accepted.
+            if (user is { } hijacker && IsForceOnForceHijacker(computer, hijacker))
+            {
+                var join = new Content.Shared.CMU14.ForceOnForce.ForceOnForceHijackStartedEvent(hijacker, destination);
+                RaiseLocalEvent(dropshipId.Value, ref join);
+            }
         }
 
         _adminLog.Add(LogType.RMCDropshipLaunch,
@@ -873,6 +912,10 @@ public sealed partial class DropshipSystem : SharedDropshipSystem
 
             while (query.MoveNext(out var uid, out var comp))
             {
+                // CMU14: Force on Force roles, hijacking, announcements and identification.
+                if (!CanLandAt(computer, uid))
+                    continue;
+
                 if (HasComp<Content.Shared.CMU14.Dropship.TacticalLand.EphemeralDropshipDestinationComponent>(uid))
                     continue;
 

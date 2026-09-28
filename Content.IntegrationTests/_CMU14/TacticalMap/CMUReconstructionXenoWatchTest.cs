@@ -6,6 +6,7 @@ using Content.Shared._RMC14.TacticalMap;
 using Content.Shared._RMC14.Xenonids.Eye;
 using Content.Shared._RMC14.Xenonids.Hive;
 using Content.Shared._RMC14.Xenonids.Watch;
+using Content.Shared._RMC14.Xenonids.Weeds;
 using Content.Shared.CCVar;
 using Content.Shared.CMU14.TacticalMap.Reconstruction;
 using Content.Shared.Mobs;
@@ -23,11 +24,12 @@ namespace Content.IntegrationTests.CMU14.TacticalMap;
 public sealed partial class CMUReconstructionTest
 {
 #pragma warning disable RA0002 // Build deterministic authorized tactical feeds and hive fixtures.
-    [TestCase(true, false)]
-    [TestCase(true, true)]
-    [TestCase(false, false)]
-    [TestCase(false, true)]
-    public async Task QueenWatchesXenoIconsThroughBothMaps(bool classic, bool remoteEye)
+    [TestCase(true, false, false)]
+    [TestCase(true, true, false)]
+    [TestCase(false, false, false)]
+    [TestCase(false, true, false)]
+    [TestCase(false, true, true)]
+    public async Task QueenWatchesXenoIconsThroughBothMaps(bool classic, bool remoteEye, bool overlappingStructure)
     {
         var session = ServerSession!;
         var original = session.AttachedEntity;
@@ -52,8 +54,10 @@ public sealed partial class CMUReconstructionTest
                 foreach (var xeno in new[] { queen, first, second })
                 {
                     SEntMan.System<SharedXenoHiveSystem>().SetHive(xeno, hive);
-                    SEntMan.SpawnEntity("XenoWeeds", SComp<TransformComponent>(xeno).Coordinates);
                 }
+                // Keep the eye on weeds while both watch targets are off weeds.
+                var weeds = SEntMan.SpawnEntity("XenoWeeds", SComp<TransformComponent>(queen).Coordinates);
+                SEntMan.RemoveComponent<XenoWeedsSpreadingComponent>(weeds);
                 Server.PlayerMan.SetAttachedEntity(session, queen);
                 if (remoteEye)
                 {
@@ -73,12 +77,24 @@ public sealed partial class CMUReconstructionTest
                     [first.Id] = new TacticalMapBlip { Indices = firstTile, Color = Color.Green },
                     [second.Id] = new TacticalMapBlip { Indices = secondTile, Color = Color.Green },
                 };
+                if (overlappingStructure)
+                {
+                    // Structure contacts are drawn after xenos and must not mask their watch targets.
+                    user.XenoStructureBlips = new()
+                    {
+                        [_console.Id] = new TacticalMapBlip { Indices = firstTile, Color = Color.Green },
+                        [_actor.Id] = new TacticalMapBlip { Indices = secondTile, Color = Color.Green },
+                    };
+                }
                 SEntMan.Dirty(queen, user);
             });
             await Pair.RunTicksSync(20);
 
             async Task Select(Vector2i tile, EntityUid target)
             {
+                await Server.WaitAssertion(() =>
+                    Assert.That(SEntMan.System<SharedXenoWeedsSystem>().IsOnWeeds(target), Is.False,
+                        "Watching a xeno must not require weeds at its position."));
                 var net = SEntMan.GetNetEntity(target);
                 await Client.WaitAssertion(() =>
                 {
@@ -113,7 +129,7 @@ public sealed partial class CMUReconstructionTest
                     Assert.That(SComp<TransformComponent>(queen).LocalPosition, Is.EqualTo(new Vector2(0.5f)));
                     if (remoteEye)
                         Assert.That(SComp<TransformComponent>(eye).LocalPosition, Is.EqualTo(new Vector2(0.5f)),
-                            "Clicking a xeno on weeds must watch it instead of teleporting the eye.");
+                            "Clicking a xeno off weeds must watch it instead of teleporting the eye.");
                 });
             }
 

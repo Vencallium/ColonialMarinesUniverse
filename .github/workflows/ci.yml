@@ -593,6 +593,12 @@ jobs:
 
       - name: Run ${{ matrix.shard.name }}
         shell: bash
+        env:
+          # RT v290's parallel YAML loader mutates the variant dictionary without
+          # synchronization. A single PLINQ worker avoids losing prototypes during
+          # startup (e.g. GasOutletInjector in PushKindInheritance).
+          # Keep this test-process workaround until the engine loader is fixed.
+          DOTNET_PROCESSOR_COUNT: "1"
         run: |
           export DOTNET_gcServer=1
           shard="${{ matrix.shard.name }}"
@@ -629,4 +635,16 @@ jobs:
           # Runner shutdowns are retried by ci-retry-infra.yml; test failures need attention.
           # NUnit otherwise drops the execution filter when a shard exceeds 2,000 tests.
           dotnet test Content.IntegrationTests.dll \
-            --verbosity normal --filter "$FILTER" -- NUnit.ConsoleOut=0 NUnit.MapWarningTo=Failed NUnit.AssemblySelectLimit=10000
+            --verbosity normal --filter "$FILTER" \
+            --blame-hang-timeout 5m --blame-hang-dump-type none \
+            --logger "trx;LogFileName=$shard.trx" --results-directory TestResults \
+            -- NUnit.ConsoleOut=0 NUnit.MapWarningTo=Failed NUnit.AssemblySelectLimit=10000
+
+      - name: Upload test diagnostics
+        if: failure() || cancelled()
+        uses: actions/upload-artifact@v7
+        with:
+          name: integration-test-results-${{ matrix.shard.name }}
+          path: bin/Content.IntegrationTests/TestResults/
+          if-no-files-found: ignore
+          retention-days: 7

@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using Content.Shared.CMU14.Medical.Anatomy.Metabolism.Events;
 using Content.Shared._RMC14.Chemistry.Reagent;
 using Content.Shared._RMC14.Medical.Stasis;
@@ -38,6 +37,27 @@ public sealed partial class MetabolizerSystem : EntitySystem
 
     [Dependency] private EntityQuery<OrganComponent> _organQuery = default!;
     [Dependency] private EntityQuery<SolutionManagerComponent> _solutionQuery = default!;
+
+    private readonly Stack<List<ReagentQuantity>> _reagentSnapshots = new();
+
+    private readonly struct ReagentSnapshot : IDisposable
+    {
+        private readonly Stack<List<ReagentQuantity>> _pool;
+        public readonly List<ReagentQuantity> Reagents;
+
+        public ReagentSnapshot(Stack<List<ReagentQuantity>> pool, List<ReagentQuantity> contents)
+        {
+            _pool = pool;
+            Reagents = pool.TryPop(out var list) ? list : new List<ReagentQuantity>(contents.Count);
+            Reagents.AddRange(contents);
+        }
+
+        public void Dispose()
+        {
+            Reagents.Clear();
+            _pool.Push(Reagents);
+        }
+    }
 
 
     [SubscribeLocalEvent]
@@ -145,8 +165,10 @@ public sealed partial class MetabolizerSystem : EntitySystem
 
         LookupSolution(ent, solutionData, true, out var transferSolution, out var transferSolutionEntity, out _);
 
-        // Copy the solution do not edit the original solution list
-        var list = solution.Contents.ToList();
+        // Effects can mutate the solution or reenter metabolism. Each active call owns its
+        // snapshot until disposal, including early returns and exceptions from callbacks.
+        using var snapshot = new ReagentSnapshot(_reagentSnapshots, solution.Contents);
+        var list = snapshot.Reagents;
 
         // Collecting blood reagent for filtering
         var ev = new MetabolismExclusionEvent();

@@ -10419,5 +10419,558 @@
   id: 681
   time: '2026-09-24T20:11:37.0000000+00:00'
   url: https://github.com/AU-14/ColonialMarinesUniverse/pull/2014
+- author: maertayn
+  changes:
+  - message: Force on Force late joins now ask before being placed on the other side
+      when
+    type: Add
+  - message: Setting the planet, platoon, ship or preset now cancels pending setup
+      votes
+    type: Admin
+  - message: GOVFOR/OPFOR job mirroring unified in one shared helper
+    type: Code
+  - message: '`cmu.game.fof_max_force_balance_gap` (default: 3) sets the FoF balancer
+      player gap'
+    type: Admin
+  id: 682
+  time: '2026-09-24T23:29:37.0000000+00:00'
+  url: https://github.com/AU-14/ColonialMarinesUniverse/pull/2015
+- author: troytroy400
+  changes:
+  - message: Complete LACN sprite and equipment Redux done by Pato.
+    type: Add
+  - message: Complete rework of ALL faction sprites including armor attachments, armor,
+      fatigues, camo for all environments, tons more customization, shipside uniforms
+      for engineering, medical, requisitions, MP, flight crew and command.
+    type: Add
+  - message: Added LACN belts, webbings, bags, gas masks, goggles, aircrew NVGs, and
+      ration packs.
+    type: Add
+  - message: Added LACN Redux weapons. Kramer Karbine, Kramer Mobile Support Weapon,
+      civilian and enforcer Kramers, TPR9 civilian, breacher and Penta shotguns, the
+      Judge shotgun revolver, and an emplaced 30mm autocannon with HE and HEAP ammo
+      links.
+    type: Add
+  - message: The Kramer AR, LSW and TPR23B now use their new LACN Redux sprites, and
+      Kramer magazine and box sprites have been updated.
+    type: Tweak
+  - message: Added Kramer attachments. 2x scope, smart-scope, bipod, underbarrel grenade
+      launcher, underbarrel shotgun and two new kramer stock variants.
+    type: Add
+  - message: Added LACN doctor, requisitions, engineering staff, combat technician,
+      MP and RTO vendors.
+    type: Add
+  - message: Split the Pilot Officer into Transport Pilot, Gunship Pilot, Fighter
+      Pilot and Fighter Systems Officer.
+    type: Add
+  - message: Dump pouches now fit three empty magazines in the space of each full
+      one, meaning you can use it as a dump pouch finally.
+    type: Tweak
+  - message: Kramer rifles now handle closer to the M41A MK1/MK2 and are easier to
+      hit your target with.
+    type: Tweak
+  - message: LACN commando sniper team now uses the new commando gear.
+    type: Tweak
+  - message: Royal Marine Commando fatigues camo now match the map. Updated RMC Rapid
+      Response Team to use them.
+    type: Tweak
+  - message: Every platoon now gets an engineering staff gear rack.
+    type: Tweak
+  - message: Loreified the standard MRE.
+    type: Tweak
+  - message: Removed the old RTO backpack from platoon command vendors.
+    type: Remove
+  - message: USCM armor kit pieces now change camouflage with the map.
+    type: Fix
+  - message: Kramer and M20A magazine sprites now properly appear and disappear with
+      the magazine.
+    type: Fix
+  - message: The not whitelisted message now informs players to apply on the forums
+      rather than the discord.
+    type: Tweak
+  - message: New vendor markers still need placing on maps. VMarkerShipReqEquipment,
+      VMarkerGovforReqEquipment, VMarkerShipEngiEquipment and VMarkerGovforEngiEquipment.
+    type: Admin
+  id: 683
+  time: '2026-09-25T21:43:40.0000000+00:00'
+  url: https://github.com/AU-14/ColonialMarinesUniverse/pull/2020
+- author: TheHellFireo
+  changes:
+  - message: Added pie throws, banana slips, and confetti cannons that interact with
+      other lobby characters.
+    type: Add
+  - message: Lobby burst fire and spray now target random crewmates with overlapping
+      dodge and tumble reactions.
+    type: Tweak
+  - message: Added the global Supply Scramble lobby show with runaway carts, flying
+      crates, and a conga exit.
+    type: Add
+  id: 684
+  time: '2026-09-26T12:36:58.0000000+00:00'
+  url: https://github.com/AU-14/ColonialMarinesUniverse/pull/2024
+- author: troytroy400
+  changes:
+  - message: Rocket launchers now have backblast. Anyone standing in the two tiles
+      behind the shooter is knocked back and down, deafened, stuttering and dizzy.
+      They also take 5-15 brute and 5-15 burn, have a 30% chance to be set on fire
+      and a 5% chance to get a concussion. Modified from the works of Harro365 on
+      github.
+    type: Add
+  - message: Added the Kramer emplaced machine gun for the LACN, sprited by Pato.
+      One can be found in req.
+    type: Add
+  - message: Added the Heavyweight Drunk trait, for those who can hold their liquor.
+      Ported from the work of CatsAndHats on github.
+    type: Add
+  - message: Playtime requirements for roundstart roles.
+    type: Add
+  - message: The LACN Landing Forces equipment vendor now properly loads, which means
+      you can get the LACN gas mask and ration packs now.
+    type: Fix
+  - message: The LACN now have the Mohawk dropship instead of the Alamo.
+    type: Tweak
+  - message: Prodigy and VAIPO can now order the AEV.
+    type: Tweak
+  - message: The Kramer Mobile Support Weapon now comes with the folding stock instead
+      of the full stock.
+    type: Tweak
+  - message: Cleaned up the character customization menu, removed unused upstream
+      features/selections from it and moved hair from markings back to appearance.
+    type: Tweak
+  - message: New characters and ghost roles no longer spawn with random markings.
+    type: Tweak
+  - message: The Humvee ARC is no longer orderable.
+    type: Remove
+  - message: The Kramer smart-scope and the B8 smart-scope now properly stop you firing
+      when friendlies are in the line of fire.
+    type: Fix
+  - message: Deployed Kramer autocannons, dropship M2Cs and M56Ds now show proper
+      names and descriptions instead of placeholder text.
+    type: Fix
+  - message: Hair color sliders in the character editor now move while you drag them.
+    type: Fix
+  id: 685
+  time: '2026-09-26T12:49:12.0000000+00:00'
+  url: https://github.com/AU-14/ColonialMarinesUniverse/pull/2025
+- author: TheHellFireo
+  changes:
+  - message: Fixed OPFOR specialist and requisitions access, inherited pilot loadout
+      saving, and missing ammunition orders.
+    type: Fix
+  - message: Corrected FoF map rotation, faction landing zones and carrier starts.
+    type: Map
+  - message: Fixed incapacitated aircraft controls, friendly laser tracking and boiler
+      acid damage to the Lexington.
+    type: Fix
+  - message: Added lasting fighter damage, three-minute repairs and emergency crash/ejection
+      sequences; adjusted vehicle durability.
+    type: Tweak
+  - message: Fixed synthetic burns, spreading fires, burning-item extinguishing, pain
+      feedback and several hive lifecycle issues.
+    type: Fix
+  - message: Restored tactical-map refresh and window controls, hid inactive layers,
+      and corrected CAS ceiling and flare handling.
+    type: Fix
+  - message: Synchronized multi-Z sky lighting and kept passengers supported on lowering
+      Mohawk ramps.
+    type: Fix
+  - message: Limited fighter supply to one jet per faction per round.
+    type: Tweak
+  - message: Added fuel to LACN engineering backpacks and allowed AM sniper magazines
+      in LACN magazine rigs.
+    type: Fix
+  - message: Prevented fighter exits into walls and tightened collision around the
+      airframe, tail and wings.
+    type: Fix
+  id: 686
+  time: '2026-09-26T15:49:24.0000000+00:00'
+  url: https://github.com/AU-14/ColonialMarinesUniverse/pull/2026
+- author: TheHellFireo
+  changes:
+  - message: Added depth-based water effects, splashes and wading sounds.
+    type: Add
+  id: 687
+  time: '2026-09-26T15:49:37.0000000+00:00'
+  url: https://github.com/AU-14/ColonialMarinesUniverse/pull/2028
+- author: TheHellFireo
+  changes:
+  - message: Added FoF role preferences with explicit side and role fallbacks, leader
+      dropship hijacking and faction command bombardment.
+    type: Add
+  - message: Added faction-targeted ship announcements, hostile dropship passenger
+      warnings and a five-minute FoF respawn delay.
+    type: Add
+  - message: Unrecognized faction uniforms now show a large red X, and hijacking chooses
+      one valid destination at random.
+    type: Tweak
+  - message: Prevented ordinary dropships from landing on opposing carriers or enemy-controlled
+      landing zones.
+    type: Fix
+  - message: Orbital bombardments now use distinct shell, laser, meteor and shockwave
+      effects with sporadic patterns, red ground warnings and no jets.
+    type: Tweak
+  - message: Fighters now crash nose-first with dramatic impact effects, readable
+      scorched cockpits and persistent wreck flames and smoke.
+    type: Tweak
+  id: 688
+  time: '2026-09-26T15:59:25.0000000+00:00'
+  url: https://github.com/AU-14/ColonialMarinesUniverse/pull/2027
+- author: troytroy400
+  changes:
+  - message: Combat deafness. Gunfire and explosions near you slowly damage your hearing.
+      You get warnings as it builds up and at higher levels explosions and gunfire
+      can knock your hearing out for a while, with deaf spells coming on by themselves
+      at the worst stage. It slowly recovers over time.
+    type: Add
+  - message: Headsets (worn or clipped onto a helmet), earpieces, earmuffs, headphones
+      (including cassette players) and certain helmets protect your hearing. Examining
+      an item tells you if it protects your hearing.
+    type: Add
+  - message: Electronic hearing protection is now available in all platoon equipment
+      vendors and orderable by colony requisitions if for some reason you are not
+      wearing your headset.
+    type: Add
+  - message: Added the Hyperacusis trait. Gunfire and explosions damage your hearing
+      twice as fast.
+    type: Add
+  - message: Added PTSD. Humans now scream horribly when set on fire. If you don't
+      attempt to put out flames within 10 seconds, your character will automatically
+      start rolling on the floor to try and save themselves.
+    type: Add
+  - message: The MK481 heavy shotgun can now be stored in suit storage.
+    type: Tweak
+  - message: The upstream guidebook is no longer visible and a CMU guidebook section
+      has been added in its place.
+    type: Tweak
+  - message: Added upstream mortar guide to the CMU guidebook with edits to be accurate
+      to our server content.
+    type: Add
+  - message: GOVFOR/OPFOR support synths no longer have access to non-faction or civilian
+      clothing.
+    type: Remove
+  id: 689
+  time: '2026-09-26T18:22:01.0000000+00:00'
+  url: https://github.com/AU-14/ColonialMarinesUniverse/pull/2029
+- author: TheHellFireo
+  changes:
+  - message: Choose whether to join your faction's hijack or return to defend your
+      ship.
+    type: Add
+  - message: Enemy identification now uses your faction's uniforms, ignores friendlies
+      and bodies, and has an optional question-mark display in settings.
+    type: Fix
+  - message: Opposing factions now have separate dropship part fabricator budgets.
+    type: Fix
+  - message: Respawns stay on your original faction for the rest of the round.
+    type: Fix
+  - message: FoF uses one role preference list for both factions.
+    type: Tweak
+  - message: Missiles hit more often; early flares and higher aircraft speed improve
+      evasion.
+    type: Tweak
+  - message: Midway launch audio continues until takeoff, and human hijack alerts
+      display readable text.
+    type: Fix
+  - message: Prevented a client water-surface crash on entities without collision
+      fixtures.
+    type: Fix
+  - message: Prevented combat-hearing checks from crashing on grappling launchers
+      and plain headgear.
+    type: Fix
+  - message: Removed the Static map button from the reconstruction window.
+    type: Remove
+  id: 690
+  time: '2026-09-26T19:16:20.0000000+00:00'
+  url: https://github.com/AU-14/ColonialMarinesUniverse/pull/2030
+- author: troytroy400
+  changes:
+  - message: 'Emotes can now include speech in quotes. For example: walks over "I
+      hate it here." The quoted part is treated like normal talking and will be effected
+      by accents, deafness, speech traits, languages, etc.'
+    type: Add
+  - message: New chat option "Switch chat back to Local/Dead after sending". After
+      you send a message on another channel, the chat box goes back to Local, or to
+      Dead chat if you're a ghost.
+    type: Add
+  - message: New chat option "Center chat input while typing like in CM13". Pressing
+      a chat key moves the chat bar to the middle of the game view while you type
+      and it goes back once you send or cancel.
+    type: Add
+  - message: The chat channel selector is now ordered Local > Emotes instead of Local
+      > Whisper to follow the order of common usage/priority.
+    type: Tweak
+  id: 691
+  time: '2026-09-27T00:45:51.0000000+00:00'
+  url: https://github.com/AU-14/ColonialMarinesUniverse/pull/2033
+- author: TheHellFireo
+  changes:
+  - message: Gunship hover now has a hull-shaped shadow, maneuvering blue lift jets,
+      ground wash, blue lighting and quieter rocket audio.
+    type: Tweak
+  - message: Fixed the hover overlay drawing exception and reversed jet artwork.
+    type: Fix
+  - message: Updated Mohawk takeoff and landing sounds, with the landing cue beginning
+      at the selected recording's 15-second mark.
+    type: Tweak
+  id: 692
+  time: '2026-09-27T01:37:36.0000000+00:00'
+  url: https://github.com/AU-14/ColonialMarinesUniverse/pull/2034
+- author: TheHellFireo
+  changes:
+  - message: Fixed dropship movement, vehicle ramp pickup, faction navigation access,
+      and initial gunship deployment.
+    type: Fix
+  - message: Added coordinated three-minute FoF dropship departures and opposing launch
+      warnings.
+    type: Add
+  - message: Disabled weedkiller canisters in FoF and enabled unfamiliar-uniform markers
+      by default.
+    type: Tweak
+  - message: Added tank maintenance mode with engine and weapon locks during repairs.
+    type: Add
+  - message: Increased explosion limb severance and corrected structural-heavy blast
+      damage against humans.
+    type: Tweak
+  - message: Fixed burst-fire hyperburst, drone IFF, and static gauss turret bullet
+      collisions.
+    type: Fix
+  - message: Restored injury overlays, animal night-vision visibility, specialist
+      vending, and colony police scanners.
+    type: Fix
+  - message: Fixed reported content exceptions, spawn/loadout problems, and missing
+      authored shuttle atmosphere.
+    type: Fix
+  id: 693
+  time: '2026-09-27T01:45:30.0000000+00:00'
+  url: https://github.com/AU-14/ColonialMarinesUniverse/pull/2035
+- author: k44908942-gif
+  changes:
+  - message: 'Added a full synthetic K9 system: player dogs can restrain targets,
+      track and bond with a marine for access, and take handler orders (Sic ''Em,
+      Evacuate) from a trained K9 handler.'
+    type: Add
+  - message: Added a K9 handler instructional pamphlet (synth vendor handler kits).
+    type: Add
+  - message: GOVFOR intel S&R K9 Team is now a tier 1 call costing 6 intel.
+    type: Tweak
+  - message: K9 handler loadout now uses ASO cap, aviators, skull balaclava, and a
+      Glock 75 holster.
+    type: Tweak
+  id: 694
+  time: '2026-09-27T09:18:18.0000000+00:00'
+  url: https://github.com/AU-14/ColonialMarinesUniverse/pull/2031
+- author: TheHellFireo
+  changes:
+  - message: Tanks now suffer spectacular ammunition cook-offs at zero integrity or
+      from critical anti-armor rocket and tank-shell hits.
+    type: Add
+  - message: Tank cook-offs throw the turret and remaining crew out, leaving an irreparable
+      burning wreck that cannot be entered.
+    type: Add
+  id: 695
+  time: '2026-09-27T10:30:53.0000000+00:00'
+  url: https://github.com/AU-14/ColonialMarinesUniverse/pull/2036
+- author: Vencallium
+  changes:
+  - message: Reworked USS Bush across multiple decks.
+    type: Map
+  - message: Added USS Bush area definitions for Vehicle Storage, Post Exchange, Sub-Deck
+      Hallway, Shoot House, Gym, Atmospherics Control, Auxiliary Flight Deck, and
+      Telecommunications.
+    type: Map
+  - message: "Updated Shiva\u2019s Snowball and added two additional upper Z-levels."
+    type: Map
+  - message: "Added Shiva\u2019s Snowball roof area definitions for Central Habitation,\
+      \ Med-Sec-Eng, and the Aerodrome."
+    type: Map
+  - message: Added colorable Alpha, Bravo, and Charlie squad floor markings.
+    type: Add
+  - message: Added colorable pilot and medical floor markings.
+    type: Add
+  - message: Added a weights bench, weight lifter, and punching bag for mapping.
+    type: Add
+  - message: Added cargo grate and marked cargo floor tiles.
+    type: Add
+  - message: Added a blue directional ultra window variant.
+    type: Add
+  - message: Added a CMU tritium canister with a custom sprite.
+    type: Add
+  - message: Added a box containing seven no-skill pill bottles.
+    type: Add
+  - message: "Added ten no-skill pill-bottle boxes to the medical vendor\u2019s stock."
+    type: Add
+  - message: Added individual vial fabrication to the medilathe, costing 125 glass
+      and 25 plastic with a four-second fabrication time.
+    type: Add
+  - message: Doubled portable oxygen and nitrogen miner output from 20 to 40 mol/s.
+    type: Tweak
+  - message: Made portable oxygen and nitrogen miners permanently anchored.
+    type: Tweak
+  - message: Switched portable gas miners to the RMC environment power channel with
+      a 1,500 W power requirement.
+    type: Tweak
+  - message: Updated gas miner examination text to list the gases produced by mixture
+      miners.
+    type: Tweak
+  - message: Removed explicit non-occluding overrides from the affected curtain prototype.
+    type: Tweak
+  - message: Updated the existing medical and smartgunner decal sprites.
+    type: Tweak
+  - message: Removed original Stable Garrison from the planet pool while retaining
+      Stable Garrison Redux.
+    type: Remove
+  - message: Fixed the map renderer missing decals stored on chunk entities.
+    type: Fix
+  - message: Added permanently anchored plasma, phoron, carbon dioxide, nitrous oxide,
+      and tritium gas miner variants for administrator spawning.
+    type: Admin
+  - message: Added an air miner that produces a mixture of 21% oxygen and 79% nitrogen.
+    type: Admin
+  - message: Configured the new gas miner variants for 40 mol/s total output and a
+      150 kPa external pressure limit.
+    type: Admin
+  - message: Added weighted gas-mixture support to gas miners.
+    type: Code
+  - message: Added validation that ignores invalid gas weights and disables mixture
+      miners when no valid mixture can be produced.
+    type: Code
+  - message: Added integration tests covering gas miner prototypes, output settings,
+      anchoring, power configuration, and air mixture configuration.
+    type: Code
+  id: 696
+  time: '2026-09-27T11:54:19.0000000+00:00'
+  url: https://github.com/AU-14/ColonialMarinesUniverse/pull/1978
+- author: TheHellFireo
+  changes:
+  - message: Prevented invalid fire state from repeatedly disrupting server updates.
+    type: Fix
+  - message: Revalidated broken atmosphere links and stopped repeated round-end requests
+      from completed threat timers.
+    type: Fix
+  - message: Added bounded server memory and client state-application diagnostics
+      for lag investigations.
+    type: Admin
+  id: 697
+  time: '2026-09-27T11:59:07.0000000+00:00'
+  url: https://github.com/AU-14/ColonialMarinesUniverse/pull/2037
+- author: johnnny34y
+  changes:
+  - message: HAZOPS M240A2 now has buffed range across all ammo types and an underbarrel
+      extinguisher slot
+    type: Tweak
+  id: 698
+  time: '2026-09-27T11:59:32.0000000+00:00'
+  url: https://github.com/AU-14/ColonialMarinesUniverse/pull/2022
+- author: TheHellFireo
+  changes:
+  - message: Tactical hover can use empty air above the planet in all game modes.
+    type: Fix
+  - message: Barricades can no longer be built on uncovered water.
+    type: Fix
+  - message: LACN equipment vendors supply engineering materials.
+    type: Fix
+  - message: Generated research recipes accept both uranium reagent sources.
+    type: Fix
+  - message: UPP tanks can select their railgun as the primary weapon.
+    type: Fix
+  - message: SLAW, SMAW, Mk86, and grenade launcher crates restock one crate every
+      20 minutes.
+    type: Tweak
+  id: 699
+  time: '2026-09-27T12:07:00.0000000+00:00'
+  url: https://github.com/AU-14/ColonialMarinesUniverse/pull/2038
+- author: TheHellFireo
+  changes:
+  - message: Restored missing tank cook-off fire, smoke, and debris effects.
+    type: Fix
+  - message: Restored the red injury vignette and its increasing intensity as health
+      falls.
+    type: Fix
+  id: 700
+  time: '2026-09-27T14:39:37.0000000+00:00'
+  url: https://github.com/AU-14/ColonialMarinesUniverse/pull/2039
+- author: troytroy400
+  changes:
+  - message: Pushups and situps emotes inspired from CM13. Your character drops down
+      and reps until they fail. How many you can do depends on your character's build,
+      height, weight and age.
+    type: Add
+  - message: Wall leaning, inspired by CM13 PvE. Click drag yourself onto a wall to
+      lean against it. Other people can walk through you while you lean, meaning you
+      can make way for people to get through areas. Moving ends the lean and slows
+      you briefly.
+    type: Add
+  - message: CPR masks. It can only be put on unconscious patients. When put on a
+      patient, CPR delays rot by a third longer. One is provided in all IFAKs.
+    type: Add
+  - message: Recovery position. Right click a downed patient (or someone laying down)
+      to roll them onto their side. Alive patients slowly recover oxygen damage and
+      dead patients gain 6 seconds on their revive timer for every minute they stay
+      in position. If your friend is waiting for medical care, roll them into the
+      recovery position and give them CPR to give them the best chance at survival.
+    type: Add
+  - message: The health analyzer now shows roughly how many minutes a dead patient
+      has left before they can't be revived/rot.
+    type: Add
+  - message: The Chemicals guides are now in the CMU Guidebook section.
+    type: Add
+  - message: CPR can no longer be done through gas masks or other solid face coverings
+      unless they are pulled down off the face. Cloth masks, scarves and cigarettes
+      don't block CPR.
+    type: Tweak
+  - message: AEDs no longer require medical skill to be used.
+    type: Tweak
+  - message: Bangalore demolition charges and retractable ladders are now Normal size
+      instead of Large and can be stored in backpacks.
+    type: Tweak
+  - message: Various LACN sprite fixes by Pato.
+    type: Fix
+  id: 701
+  time: '2026-09-27T19:56:52.0000000+00:00'
+  url: https://github.com/AU-14/ColonialMarinesUniverse/pull/2040
+- author: troytroy400
+  changes:
+  - message: The character editor now has separate First name, Last name and Nickname
+      fields.
+    type: Add
+  - message: New United Americas Artificial Womb Soldier origin, which adds A.W. after
+      your first name.
+    type: Add
+  - message: 'New human chat speech sounds pulled from CM13 PR #13157, with separate
+      male and female voices and different sounds for questions and exclamations.'
+    type: Add
+  - message: New CMU chat option to turn off speech sounds for yourself in settings.
+    type: Add
+  - message: You can now jump on a live grenade by lying on it (shift + r). You absorb
+      the whole blast and shrapnel, taking the full grenade's damage to each limb
+      (to simulate the close range explosion), losing at minimum two limbs and with
+      a 10% chance of losing your head (being instantly killed). Everyone else nearby
+      will still be knocked down by the blast but take no damage, meaning you can
+      medal of honor this shit.
+    type: Add
+  - message: If a grenade detonates in your hand it will now blow that hand off.
+    type: Add
+  - message: Ghosts have a new "Ghost Color" button in the ghost bar that allows them
+      to change the color of their ghost.
+    type: Add
+  - message: Synthetic characters now use a single name only.
+    type: Tweak
+  - message: The Traits and Markings tabs in the character editor now come right after
+      Regulation Appearance.
+    type: Tweak
+  - message: Divider lines in the character editor now follow your CRT UI colour.
+    type: Tweak
+  - message: The Boo/Scare ghost action is now off by default.
+    type: Tweak
+  - message: The roleplay name rules have been updated for the new name fields and
+      the Artificial Womb origin.
+    type: Tweak
+  - message: The roleplay rules now refer to Biomorphs instead of Abominations.
+    type: Tweak
+  - message: Laselle Bionational has been removed from the allegiance list.
+    type: Remove
+  id: 702
+  time: '2026-09-28T02:53:44.0000000+00:00'
+  url: https://github.com/AU-14/ColonialMarinesUniverse/pull/2042
 Name: CMU
 Order: -1

@@ -1248,10 +1248,14 @@ public abstract partial class CMUSharedZLevelsSystem
         {
             for (var y = -1; y <= 1; y++)
             {
+                var tile = checkingTile + new Vector2i(x, y);
+                var local = gridLocal - new Vector2(tile.X, tile.Y);
+                if (!CanReachHighGroundSupport(local))
+                    continue;
+
                 if (profiling)
                     _profileZHighGroundTiles++;
 
-                var tile = checkingTile + new Vector2i(x, y);
                 var isCurrentTile = x == 0 && y == 0;
                 var query = _map.GetAnchoredEntitiesEnumerator(checkingGridUid, checkingGrid, tile);
 
@@ -1269,7 +1273,6 @@ public abstract partial class CMUSharedZLevelsSystem
                     if (heightComp.HeightCurve.Count == 0)
                         continue;
 
-                    var local = gridLocal - new Vector2(tile.X, tile.Y);
                     if (!TryGetHighGroundCurveT(uid.Value, heightComp, local, isCurrentTile, out var t))
                         continue;
 
@@ -1335,6 +1338,11 @@ public abstract partial class CMUSharedZLevelsSystem
     {
         distance = 0f;
 
+        // Every swept sticky candidate rejects these velocities. Avoid searching intermediate
+        // tiles when jumping upward or falling too quickly to stick to a ramp.
+        if (target.Comp.Velocity > 0.01f || target.Comp.Velocity <= -4f)
+            return false;
+
         var oldMapCoordinates = _transform.ToMapCoordinates(args.OldPosition, false);
         var newMapCoordinates = _transform.ToMapCoordinates(args.NewPosition, false);
         if (oldMapCoordinates.MapId == MapId.Nullspace ||
@@ -1367,9 +1375,15 @@ public abstract partial class CMUSharedZLevelsSystem
             (int)MathF.Ceiling(moveDistance / MoveGroundSnapSweepStep),
             1,
             MaxMoveGroundSnapSweepSamples);
+        if (sampleCount <= 1)
+            return false;
+
         if (Prof.IsEnabled)
             _profileZMoveSnapSweepSamples += Math.Max(0, sampleCount - 1);
 
+        // The grid and endpoints are unchanged throughout this synchronous sweep.
+        var oldGridLocal = _map.WorldToLocal(mapUid, mapGrid, oldMapCoordinates.Position) / mapGrid.TileSize;
+        var newGridLocal = _map.WorldToLocal(mapUid, mapGrid, newMapCoordinates.Position) / mapGrid.TileSize;
         var found = false;
         var bestDistance = 0f;
         Entity<CMUZLevelMapComponent> checkingMap = (mapUid, zMapComp);
@@ -1383,8 +1397,8 @@ public abstract partial class CMUSharedZLevelsSystem
                     target,
                     checkingMap,
                     mapGrid,
-                    oldMapCoordinates.Position,
-                    newMapCoordinates.Position,
+                    oldGridLocal,
+                    newGridLocal,
                     sampleWorldPosition,
                     bestSnappedLocalPosition,
                     out var candidateDistance,
@@ -1409,8 +1423,8 @@ public abstract partial class CMUSharedZLevelsSystem
         Entity<CMUZPhysicsComponent> target,
         Entity<CMUZLevelMapComponent> checkingMap,
         MapGridComponent checkingGrid,
-        Vector2 oldWorldPosition,
-        Vector2 newWorldPosition,
+        Vector2 oldGridLocal,
+        Vector2 newGridLocal,
         Vector2 sampleWorldPosition,
         float bestSnappedLocalPosition,
         out float distance,
@@ -1423,8 +1437,6 @@ public abstract partial class CMUSharedZLevelsSystem
         snappedLocalPosition = 0f;
 
         var checkingTile = _map.WorldToTile(checkingMap, checkingGrid, sampleWorldPosition);
-        var oldGridLocal = _map.WorldToLocal(checkingMap, checkingGrid, oldWorldPosition) / checkingGrid.TileSize;
-        var newGridLocal = _map.WorldToLocal(checkingMap, checkingGrid, newWorldPosition) / checkingGrid.TileSize;
         var sampleGridLocal = _map.WorldToLocal(checkingMap, checkingGrid, sampleWorldPosition) / checkingGrid.TileSize;
 
         var found = false;
@@ -1438,6 +1450,10 @@ public abstract partial class CMUSharedZLevelsSystem
                 var tile = checkingTile + new Vector2i(x, y);
                 var isCurrentTile = x == 0 && y == 0;
                 var tileOrigin = new Vector2(tile.X, tile.Y);
+                var sampleLocal = sampleGridLocal - tileOrigin;
+                if (!CanReachHighGroundSupport(sampleLocal))
+                    continue;
+
                 var query = _map.GetAnchoredEntitiesEnumerator(checkingMap, checkingGrid, tile);
 
                 while (query.MoveNext(out var uid))
@@ -1452,7 +1468,6 @@ public abstract partial class CMUSharedZLevelsSystem
                         continue;
                     }
 
-                    var sampleLocal = sampleGridLocal - tileOrigin;
                     if (!TryGetHighGroundCurveT(uid.Value, heightComp, sampleLocal, isCurrentTile, out var sampleT))
                         continue;
 
@@ -1482,6 +1497,16 @@ public abstract partial class CMUSharedZLevelsSystem
         distance = bestDistance;
         snappedLocalPosition = bestLocalPosition;
         return true;
+    }
+
+    private static bool CanReachHighGroundSupport(Vector2 local)
+    {
+        // Every flat, corner, and cardinal ramp support test is contained in this square.
+        // Reject unreachable tiles before enumerating their anchored entities. The small margin
+        // keeps this conservative when mirrored ramp axes (1 - local) round at the edge.
+        const float reach = HighGroundEdgeSupport + 0.000001f;
+        return !(local.X < -reach || local.X > 1f + reach ||
+                 local.Y < -reach || local.Y > 1f + reach);
     }
 
     private bool TryGetHighGroundCurveT(

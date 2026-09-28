@@ -72,11 +72,10 @@ namespace Content.Server.Light.EntitySystems
 
             component.StateExpiryTime -= frameTime;
 
-            // RMC14
-            Dirty(ent);
-
             if (component.StateExpiryTime <= 0f)
             {
+                // The countdown is server-only; replicate the visible state transition.
+                Dirty(ent);
                 switch (component.CurrentState)
                 {
                     case ExpendableLightState.Lit:
@@ -163,6 +162,7 @@ namespace Content.Server.Light.EntitySystems
             {
                 component.CurrentState = ExpendableLightState.BrandNew;
                 component.StateExpiryTime = (float)component.RefuelMaterialTime.TotalSeconds;
+                Dirty(uid, component);
 
                 _nameModifier.RefreshNameModifiers(uid);
                 _stackSystem.ReduceCount((args.Used, stack), 1);

@@ -25,6 +25,12 @@ public sealed class ServerProfilerCaptureTest
                 using (diagnostics.MeasureOperation("regression-fill", "TestPrototype"))
                     GC.KeepAlive(new byte[2 * 1024 * 1024]);
                 Assert.That(diagnostics.CaptureManualReport(), Is.True);
+                var memory = capture.Messages.Single(message => message.StartsWith("[CMU-PERF] memory "));
+                Assert.That(memory, Does.Contain("processRssBytes="));
+                Assert.That(memory, Does.Contain("managedBytes="));
+                Assert.That(memory, Does.Contain("heapBytesAtLastGc="));
+                Assert.That(memory, Does.Contain("gen2Collections="));
+                Assert.That(memory, Does.Contain("memorySampleAgeSeconds="));
                 var operation = capture.Messages.Single(message => message.Contains("name=regression-fill "));
                 Assert.That(operation, Does.Contain("prototype=TestPrototype "));
                 Assert.That(operation, Does.Contain("source=content-scope"));

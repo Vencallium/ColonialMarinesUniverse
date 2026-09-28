@@ -327,15 +327,24 @@ public abstract partial class SharedMoverController : VirtualController
         }
         else
         {
-            var virtualGroundEvent = new IsVirtualGroundForMovementEvent();
-            RaiseLocalEvent(uid, ref virtualGroundEvent);
-
             // Should we ignore the friction of the tile we're standing on?
             if (MapGridQuery.TryComp(xform.GridUid, out var gridComp)
                 && _mapSystem.TryGetTileRef(xform.GridUid.Value, gridComp, xform.Coordinates, out var tile)
-                && physicsComponent.BodyStatus == BodyStatus.OnGround
-                && !(tile.Tile.IsEmpty && virtualGroundEvent.Grounded))
-                tileDef = (ContentTileDefinition)_tileDefinitionManager[tile.Tile.TypeId];
+                && physicsComponent.BodyStatus == BodyStatus.OnGround)
+            {
+                // CMU: virtual support only changes friction on empty tiles. Ordinary floors do not
+                // need the potentially expensive Z-level support search.
+                var virtualGround = false;
+                if (tile.Tile.IsEmpty)
+                {
+                    var virtualGroundEvent = new IsVirtualGroundForMovementEvent();
+                    RaiseLocalEvent(uid, ref virtualGroundEvent);
+                    virtualGround = virtualGroundEvent.Grounded;
+                }
+
+                if (!virtualGround)
+                    tileDef = (ContentTileDefinition)_tileDefinitionManager[tile.Tile.TypeId];
+            }
 
             var walkSpeed = moveSpeedComponent?.CurrentWalkSpeed ?? MovementSpeedModifierComponent.DefaultBaseWalkSpeed;
             var sprintSpeed = moveSpeedComponent?.CurrentSprintSpeed ?? MovementSpeedModifierComponent.DefaultBaseSprintSpeed;
@@ -577,7 +586,7 @@ public abstract partial class SharedMoverController : VirtualController
     {
         sound = null;
 
-        if (!CanSound() || !_tags.HasTag(uid, FootstepSoundTag))
+        if (!CanSound())
             return false;
 
         var coordinates = xform.Coordinates;
@@ -611,6 +620,18 @@ public abstract partial class SharedMoverController : VirtualController
             return false;
 
         mobMover.StepSoundDistance -= distanceNeeded;
+
+        // CMU14: water movement overrides footwear, including silent walking.
+        var mobSound = new GetMobFootstepSoundEvent();
+        RaiseLocalEvent(uid, ref mobSound);
+        if (mobSound.Handled)
+        {
+            sound = mobSound.Sound;
+            return sound != null;
+        }
+
+        if (!_tags.HasTag(uid, FootstepSoundTag))
+            return false;
 
         if (FootstepModifierQuery.TryComp(uid, out var moverModifier))
         {

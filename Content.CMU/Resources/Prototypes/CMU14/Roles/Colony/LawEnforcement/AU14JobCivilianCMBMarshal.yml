@@ -71,6 +71,7 @@
   storage:
     back:
     - AU14GuidebookLawColonial
+    - ForensicScanner
     - AU14StampCMBM
 
 - type: entity

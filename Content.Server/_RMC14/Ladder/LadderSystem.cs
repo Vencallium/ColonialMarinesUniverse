@@ -44,6 +44,7 @@ public sealed partial class LadderSystem : SharedLadderSystem
         RemoveWatcher(watcher);
         EnsureComp<LadderWatchingComponent>(watcher).Watching = toWatch;
         toWatch.Comp.Watching.Add(watcher);
+        Dirty(toWatch);
     }
 
     protected override void Unwatch(Entity<EyeComponent?> watcher, ICommonSession player)
@@ -67,7 +68,10 @@ public sealed partial class LadderSystem : SharedLadderSystem
             return;
 
         if (TryComp(watching.Watching, out LadderComponent? watched))
+        {
             watched.Watching.Remove(toRemove);
+            Dirty(watching.Watching.Value, watched);
+        }
 
         watching.Watching = null;
         RemCompDeferred<LadderWatchingComponent>(toRemove);
