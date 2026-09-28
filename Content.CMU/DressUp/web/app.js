@@ -5,9 +5,10 @@ const images = new Map();
 const directions = [0, 2, 1, 3]; // Clockwise: south, east, north, west; RSI uses S,N,E,W.
 const facing = ['SOUTH', 'EAST', 'NORTH', 'WEST'];
 const views = ['FRONT', 'LEFT SIDE', 'BACK', 'RIGHT SIDE'];
-const state = { slot: 'jumpsuit', equipped: {}, attachments: { helmetAccessories: [], armorAddons: [] }, focusedAttachment: {}, markings: [], direction: 0, page: 0 };
+const state = { slot: 'jumpsuit', equipped: {}, attachments: { helmetAccessories: [], armorAddons: [], uniformAddons: [] }, focusedAttachment: {}, markings: [], direction: 0, page: 0 };
 const hands = ['leftHand', 'rightHand'];
-const attachmentParents = { helmetAccessories: 'head', armorAddons: 'outerClothing' };
+const attachmentParents = { helmetAccessories: 'head', armorAddons: 'outerClothing', uniformAddons: 'jumpsuit' };
+const parentNames = { helmetAccessories: 'headgear', armorAddons: 'armor', uniformAddons: 'uniform or outerwear' };
 const picker = { kind: 'Hair', page: 0, version: 0 };
 let data, byId, renderVersion = 0;
 const pageSize = 6;
@@ -80,11 +81,28 @@ function selectedLayers(slot, selection = selectedEntry(slot)) {
   const item = byId.get(selection.id);
   return (selection.variant >= 0 ? item.variants[selection.variant].layers : item.layers)[slot] || [];
 }
-function attachmentHolder(group) {
-  const slot = attachmentParents[group];
+function attachmentHolder(group, selection = selectedEntry(group)) {
+  const slot = selection?.target || attachmentParents[group];
   const parent = state.equipped[slot];
   const holder = parent && byId.get(parent.id).accessoryHolders?.[group];
+  if (group === 'uniformAddons' && selection && !holder?.categories.includes(byId.get(selection.id).uniformAccessory.category)) return null;
   return holder?.slots.includes(slot) ? holder : null;
+}
+function uniformTargets(item) {
+  return data.slots.filter(slot => !slot.multiple && state.equipped[slot.id]
+    && byId.get(state.equipped[slot.id].id).accessoryHolders?.uniformAddons?.slots.includes(slot.id)
+    && byId.get(state.equipped[slot.id].id).accessoryHolders.uniformAddons.categories.includes(item.uniformAccessory.category));
+}
+function uniformKindName(kind) {
+  return ({ Rank: 'Ranks', Patch: 'Patches', Armband: 'Armbands', Medal: 'Medals', Tie: 'Ties', PridePin: 'Pins',
+    WristL: 'Left wrist accessories', WristR: 'Right wrist accessories', GroinPlate: 'Groin plates',
+    NeckGuard: 'Neck guards', ShinGuard: 'Shin guards', KneeGuard: 'Knee guards' })[kind] || kind;
+}
+function uniformAddonVisible(selected, holder) {
+  const item = byId.get(selected.id);
+  const parent = state.equipped[selected.target];
+  const folded = parent && byId.get(parent.id).variants[parent.variant]?.hideAccessories;
+  return !item.uniformAccessory.hidden && !((folded || holder.hidden) && item.uniformAccessory.hiddenByJacketRolling);
 }
 function allowsBody(marking) {
   const sexes = Array.isArray(marking.sex) ? marking.sex : marking.sex ? [marking.sex] : [];
@@ -159,10 +177,21 @@ async function render() {
   const equipment = slot => {
     selectedLayers(slot).forEach(layer => plans.push([layer, null, body === 'f' && slot === 'jumpsuit' ? data.body.femaleDisplacement : null]));
     for (const [group, parentSlot] of Object.entries(attachmentParents)) {
-      if (parentSlot !== slot) continue;
-      const holder = attachmentHolder(group);
-      if (!holder) continue;
+      const keys = new Set(); let index = 0;
       for (const selected of state.attachments[group]) {
+        if ((selected.target || parentSlot) !== slot) continue;
+        const holder = attachmentHolder(group, selected);
+        if (!holder) continue;
+        if (group === 'uniformAddons') {
+          if (!uniformAddonVisible(selected, holder)) continue;
+          const accessory = byId.get(selected.id).uniformAccessory;
+          // The game keeps the first accessory for each named layer on a garment.
+          const key = accessory.layerKeys.length
+            ? accessory.layerKeys[accessory.limit > 1 ? Math.min(index, accessory.layerKeys.length - 1) : 0] : null;
+          if (key && keys.has(key)) continue;
+          if (key) keys.add(key);
+          index++;
+        }
         selectedLayers(group, selected).forEach(layer => plans.push([holder.isHat && layer.hat ? layer.hat : layer]));
       }
     }
@@ -230,7 +259,7 @@ function equipmentUI() {
     const name = document.createElement('strong'); name.textContent = slot.name;
     const label = document.createElement('small'); label.textContent = slot.multiple && selected ? summary : item?.name || 'Empty';
     text.append(name, label); button.append(picture, text);
-    button.onclick = () => { state.slot = slot.id; state.page = 0; $('search-scope').value = 'slot'; $('search').value = ''; refresh(); };
+    button.onclick = () => { state.slot = slot.id; state.page = 0; $('search-scope').value = 'slot'; $('search').value = ''; $('addon-kind').value = 'all'; refresh(); };
     $('equipment').append(button);
   }
 }
@@ -245,7 +274,11 @@ function equip(id, slot = state.slot) {
   }
   state.slot = slot;
   if (slot in attachmentParents) {
-    if (!state.attachments[slot].some(entry => entry.id === id)) state.attachments[slot].push({ id, variant: -1 });
+    if (!state.attachments[slot].some(entry => entry.id === id)) {
+      const targets = slot === 'uniformAddons' ? uniformTargets(item) : [];
+      const target = slot === 'uniformAddons' ? (targets.find(s => s.id === 'jumpsuit') || targets[0])?.id || 'jumpsuit' : attachmentParents[slot];
+      state.attachments[slot].push({ id, variant: -1, target });
+    }
     state.focusedAttachment[slot] = id;
   } else state.equipped[slot] = { id, variant: -1 };
   status(`${item.name} equipped in ${data.slots.find(s => s.id === slot).name}.`);
@@ -255,7 +288,11 @@ function catalogUI() {
   const query = $('search').value.trim().toLowerCase();
   const source = $('collection').value;
   const allSlots = $('search-scope').value === 'all';
+  const uniformBrowse = !allSlots && state.slot === 'uniformAddons';
+  $('addon-kind-label').hidden = !uniformBrowse;
+  const kind = uniformBrowse ? $('addon-kind').value : 'all';
   const items = data.items.filter(item => (allSlots || item.slots.includes(state.slot))
+    && (kind === 'all' || item.uniformAccessory?.kind === kind)
     && (source === 'all' || (source === 'LACN' ? /lacn/i.test(`${item.id} ${item.name} ${item.source}`) : collection(item) === source))
     && `${item.name} ${item.id}`.toLowerCase().includes(query));
   const pages = Math.max(1, Math.ceil(items.length / pageSize));
@@ -274,10 +311,10 @@ function catalogUI() {
     const text = document.createElement('span'); text.textContent = item.name;
     const tag = document.createElement('small'); tag.textContent = collection(item) === 'RMC' ? 'RMC14' : collection(item);
     const slotLabel = document.createElement('small');
-    slotLabel.textContent = item.weapon ? 'Weapon · left / right hand' : item.slots.filter(slot => !hands.includes(slot)).map(slot => data.slots.find(s => s.id === slot).name).join(' / ') || 'No compatible slot';
+    slotLabel.textContent = uniformBrowse ? uniformKindName(item.uniformAccessory.kind) : item.weapon ? 'Weapon · left / right hand' : item.slots.filter(slot => !hands.includes(slot)).map(slot => data.slots.find(s => s.id === slot).name).join(' / ') || 'No compatible slot';
     button.append(picture, text, tag, slotLabel);
     button.disabled = !item.slots.length;
-    button.onclick = () => equip(item.id, item.slots.includes(state.slot) ? state.slot : item.weapon ? 'rightHand' : item.slots[0]);
+    button.onclick = () => equip(item.id, item.slots.includes(state.slot) ? state.slot : item.weapon ? 'rightHand' : !item.clothing && item.uniformAccessory ? 'uniformAddons' : item.slots[0]);
     $('catalog').append(button);
   }
   if (!items.length) {
@@ -298,8 +335,23 @@ function detailsUI() {
     const hint = document.createElement('p'); hint.className = 'notice';
     hint.textContent = attachmentHolder(state.slot)
       ? 'Added above the equipped gear. Choose more pieces to combine them; the last added piece is drawn on top.'
-      : `Added to your outfit. Equip compatible ${state.slot === 'helmetAccessories' ? 'headgear' : 'armor'} to show it in the preview.`;
+      : `Added to your outfit. Equip compatible ${parentNames[state.slot]} to show it in the preview.`;
     panel.append(hint);
+  }
+  if (state.slot === 'uniformAddons') {
+    const label = document.createElement('label'); label.textContent = 'Attach to';
+    const select = document.createElement('select');
+    const targets = uniformTargets(item);
+    if (!targets.some(slot => slot.id === selected.target)) select.add(new Option(`${data.slots.find(s => s.id === selected.target).name} · waiting for compatible gear`, selected.target));
+    targets.forEach(slot => select.add(new Option(slot.name, slot.id)));
+    select.value = selected.target;
+    select.onchange = () => { selected.target = select.value; refresh(); };
+    label.append(select); panel.append(label);
+    if (item.uniformAccessory.hidden || (attachmentHolder('uniformAddons') && !uniformAddonVisible(selected, attachmentHolder('uniformAddons')))) {
+      const note = document.createElement('p'); note.className = 'notice';
+      note.textContent = item.uniformAccessory.hidden ? 'This accessory is concealed in the game and does not show on the character.' : 'This accessory is hidden while this garment’s jacket is rolled.';
+      panel.append(note);
+    }
   }
   if (item.slots.length > 1) {
     const label = document.createElement('label'); label.textContent = 'Equip in';
@@ -325,7 +377,7 @@ function detailsUI() {
     };
     label.append(select); panel.append(label);
   }
-  if (!selectedLayers(state.slot).length) {
+  if (!selectedLayers(state.slot).length && !(state.slot === 'uniformAddons' && item.uniformAccessory.hidden)) {
     const notice = document.createElement('p'); notice.className = 'notice';
     notice.textContent = `This item has no ${hands.includes(state.slot) ? 'in-hand' : 'human worn'} sprite for this slot/style. It is equipped but will not change the preview.`;
     panel.append(notice);
@@ -346,7 +398,8 @@ function attachmentsUI() {
     const section = document.createElement('section'); section.className = 'accessory-group';
     const title = document.createElement('h3'); title.textContent = data.slots.find(slot => slot.id === group).name;
     const hint = document.createElement('p'); hint.className = 'accessory-hint';
-    hint.textContent = attachmentHolder(group) ? 'Select a piece to change its style.' : `Waiting for compatible ${group === 'helmetAccessories' ? 'headgear' : 'armor'}.`;
+    hint.textContent = group === 'uniformAddons' ? 'Select a piece to change its style or garment. Clothing can cover accessories attached to the uniform.'
+      : attachmentHolder(group) ? 'Select a piece to change its style.' : `Waiting for compatible ${parentNames[group]}.`;
     section.append(title, hint);
     for (const selected of state.attachments[group]) {
       const item = byId.get(selected.id);
@@ -355,7 +408,8 @@ function attachmentsUI() {
       button.setAttribute('aria-pressed', String(state.slot === group && selectedEntry(group) === selected));
       const picture = document.createElement('canvas'); void icon(picture, item);
       const text = document.createElement('span'); text.textContent = item.name;
-      const style = document.createElement('small'); style.textContent = item.variants[selected.variant]?.name || 'Default';
+      const style = document.createElement('small'); style.textContent = (item.variants[selected.variant]?.name || 'Default')
+        + (group === 'uniformAddons' ? ` · ${data.slots.find(s => s.id === selected.target).name}${attachmentHolder(group, selected) ? '' : ' · Waiting for compatible gear'}` : '');
       text.append(style); button.append(picture, text);
       button.onclick = () => { state.slot = group; state.focusedAttachment[group] = selected.id; refresh(); };
       const remove = document.createElement('button'); remove.textContent = '✕'; remove.setAttribute('aria-label', `Remove ${item.name}`);
@@ -493,6 +547,7 @@ async function start() {
   const response = await fetch('catalog.json');
   if (!response.ok) throw new Error(`Catalog returned ${response.status}`);
   data = await response.json(); byId = new Map(data.items.map(item => [item.id, item]));
+  for (const kind of [...new Set(data.items.filter(item => item.uniformAccessory).map(item => item.uniformAccessory.kind))].sort()) $('addon-kind').add(new Option(uniformKindName(kind), kind));
   customizationUI();
   if ([...$('Hair').options].some(o => o.value === 'RMCHumanHairCrew')) $('Hair').value = 'RMCHumanHairCrew';
   for (const [part, value] of [['UndergarmentTop', 'RMCUndershirtStandard'], ['UndergarmentBottom', 'RMCUnderwearBoxersBlue']]) {
@@ -511,7 +566,7 @@ async function start() {
   $('picker-previous').onclick = () => { picker.page--; pickerUI(); };
   $('picker-next').onclick = () => { picker.page++; pickerUI(); };
   $('name').oninput = () => { $('preview-name').textContent = $('name').value || 'New marine'; };
-  $('search').oninput = $('collection').onchange = () => { state.page = 0; catalogUI(); };
+  $('search').oninput = $('collection').onchange = $('addon-kind').onchange = () => { state.page = 0; catalogUI(); };
   $('search-scope').onchange = () => { state.page = 0; if ($('search-scope').value === 'all') $('collection').value = 'all'; catalogUI(); };
   $('previous').onclick = () => { state.page--; catalogUI(); }; $('next').onclick = () => { state.page++; catalogUI(); };
   $('rotate-left').onclick = () => rotate(-1); $('rotate-right').onclick = () => rotate(1);
@@ -527,7 +582,7 @@ async function start() {
     void render();
   };
   $('lighting').onchange = $('brightness').oninput = updateLighting;
-  $('clear').onclick = () => { state.equipped = {}; state.attachments = { helmetAccessories: [], armorAddons: [] }; state.focusedAttachment = {}; status('Outfit cleared.'); refresh(); };
+  $('clear').onclick = () => { state.equipped = {}; state.attachments = { helmetAccessories: [], armorAddons: [], uniformAddons: [] }; state.focusedAttachment = {}; status('Outfit cleared.'); refresh(); };
   $('export').onclick = async () => {
     await render();
     const output = document.createElement('canvas'); output.width = 768; output.height = 768;

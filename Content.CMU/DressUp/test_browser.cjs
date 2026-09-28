@@ -135,6 +135,56 @@ const url = process.argv[3] || 'http://127.0.0.1:4173';
     await page.waitForFunction(() => document.querySelector('#equipped-count').textContent === '0 items equipped');
     assert.equal(await page.locator('#chosen-accessories .accessory-entry').count(), 0);
     await equip('JumpsuitMarine', 'jumpsuit');
+    // Uniform add-ons use their worn art, category filters and garment attachment target.
+    await page.getByRole('button', { name: 'Uniform add-ons: empty', exact: true }).click();
+    await page.locator('#collection').selectOption('all');
+    await page.locator('#addon-kind').selectOption('Rank');
+    await page.locator('#search').fill('CMU14ChevronLACNSailor');
+    await page.locator('button.item[title="CMU14ChevronLACNSailor"]').click();
+    assert.equal(await page.locator('#item-detail label').filter({ hasText: 'Attach to' }).locator('select').inputValue(), 'jumpsuit');
+    await page.locator('#addon-kind').selectOption('Patch');
+    await page.locator('#search').fill('AU14PatchUSCM');
+    await page.locator('button.item[title="AU14PatchUSCM"]').click();
+    await page.locator('#addon-kind').selectOption('Armband');
+    await page.locator('#search').fill('RMCAlphaArmband');
+    await page.locator('button.item[title="RMCAlphaArmband"]').click();
+    await page.waitForTimeout(100);
+    const uniformWithAddons = await pixels();
+    assert.equal(await page.locator('#chosen-accessories .accessory-entry').count(), 3);
+    for (const face of ['EAST', 'NORTH', 'WEST', 'SOUTH']) {
+      await page.locator('#rotate-right').click();
+      await page.waitForFunction(value => document.querySelector('#facing').textContent === value, face);
+    }
+    assert.equal(await pixels(), uniformWithAddons, 'Uniform accessories rotate with the outfit');
+    await page.getByRole('button', { name: /^Uniform: / }).click();
+    await page.locator('#item-detail label').filter({ hasText: 'Style' }).locator('select').selectOption({ label: 'Jacket' });
+    await page.waitForFunction(old => document.querySelector('#character').toDataURL() !== old, uniformWithAddons);
+    const rolled = await pixels();
+    await page.locator('#chosen-accessories [data-id="AU14PatchUSCM"] > button:last-child').click();
+    await page.waitForTimeout(100);
+    assert.equal(await pixels(), rolled, 'Rolling the jacket hides patches marked hiddenByJacketRolling');
+    await equip('AU14PatchUSCM', 'uniformAddons');
+    assert.equal(await pixels(), rolled, 'Adding a hidden patch does not show it on a rolled jacket');
+    await page.getByRole('button', { name: /^Uniform: / }).click();
+    await page.locator('#item-detail label').filter({ hasText: 'Style' }).locator('select').selectOption('-1');
+    await page.waitForFunction(old => document.querySelector('#character').toDataURL() === old, uniformWithAddons);
+    // This coat covers the armband on a uniform; the LACN vest leaves those pixels exposed.
+    await equip('CMCoatChiefMP', 'outerClothing');
+    await page.locator('#chosen-accessories [data-id="RMCAlphaArmband"] .accessory-select').click();
+    const targetSelect = page.locator('#item-detail label').filter({ hasText: 'Attach to' }).locator('select');
+    const beforeMovingArmband = await pixels();
+    await targetSelect.selectOption('outerClothing');
+    await page.waitForFunction(old => document.querySelector('#character').toDataURL() !== old, beforeMovingArmband);
+    assert.match(await page.locator('#chosen-accessories [data-id="RMCAlphaArmband"]').innerText(), /Outerwear/);
+    await page.screenshot({ path: path.join(qa, 'uniform-addons.png'), fullPage: true });
+    await page.setViewportSize({ width: 390, height: 844 });
+    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'Uniform accessory lists fit mobile width');
+    await page.screenshot({ path: path.join(qa, 'uniform-addons-mobile.png'), fullPage: true });
+    await page.setViewportSize({ width: 1440, height: 1050 });
+    await page.locator('#clear').click();
+    await page.waitForFunction(() => document.querySelector('#equipped-count').textContent === '0 items equipped');
+    assert.equal(await page.locator('#chosen-accessories .accessory-entry').count(), 0);
+    await equip('JumpsuitMarine', 'jumpsuit');
     // Global search crosses both collections and equipment slots.
     await page.locator('#search-scope').selectOption('all');
     assert.equal(await page.locator('#collection').inputValue(), 'all');

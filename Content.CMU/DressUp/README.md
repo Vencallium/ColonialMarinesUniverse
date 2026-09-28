@@ -58,6 +58,14 @@ frames, attribution metadata, coverage report, and source code license.
   the character. Unsupported gear leaves the pieces selected with a notice.
   The **LACN gear** filter includes the updated uniforms, armor, headgear,
   flight gear, webbing, weapons, and accessories.
+- Uniform add-ons, including patches, rank chevrons, armbands, ties, medals,
+  pins, watches, and other `UniformAccessory` items. Browse **Uniform add-ons**
+  and use the accessory-type filter to find ranks or patches. Pieces stack and
+  rotate; **Attach to** moves a piece to an equipped garment that accepts its
+  category. Add-ons follow their chosen garment and can be covered by outerwear.
+  Rolled jackets hide accessories marked `hiddenByJacketRolling`. Concealed
+  accessories remain concealed. Chevrons with `RankChanger` appear under Rank
+  in the filter while retaining the game's attachment category.
 - Four-direction sprite rotation with buttons, arrow keys when the preview is
   focused, or horizontal dragging/swiping. Integer zoom and transparent PNG export.
 - Full bright, natural daylight, warm indoor, night, and emergency-red lighting,
@@ -67,7 +75,7 @@ frames, attribution metadata, coverage report, and source code license.
   preserves the original rendered sprite colors.
 - All non-abstract entities with an inherited `Clothing` component, plus
   holdable entities with `Gun` or `MeleeWeapon`, and entities with
-  `HelmetAccessory` or `OuterClothingAccessory`, from both
+  `HelmetAccessory`, `OuterClothingAccessory`, or `UniformAccessory`, from both
   `Resources/Prototypes` and `Content.CMU/Resources/Prototypes`. This includes
   equipment such as belts, weapons, and pocket items. An item with no compatible
   human inventory slot cannot be equipped; see `build-report.json`.
@@ -77,7 +85,7 @@ frames, attribution metadata, coverage report, and source code license.
 
 This is a static appearance preview, not the game engine. It renders the first
 animation frame. Items that have no human worn overlay remain selectable and
-show a notice. Runtime systems such as squad patches, powered
+show a notice. Runtime systems such as automatic squad insignia, powered
 lights, shader effects, and inventory restrictions
 beyond slot compatibility are not simulated. Camouflage and folding styles are
 individual alternatives, not combinable runtime states. Other species are not

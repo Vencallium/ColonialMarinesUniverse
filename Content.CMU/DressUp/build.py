@@ -35,10 +35,12 @@ SLOTS = {
     "rightHand": ("Right hand", "RIGHTHAND", "inhand-right"),
     "helmetAccessories": ("Helmet accessories", "HELMETACCESSORY", ""),
     "armorAddons": ("Armor add-ons", "ARMORADDON", ""),
+    "uniformAddons": ("Uniform add-ons", "UNIFORMADDON", ""),
 }
 ACCESSORIES = {
     "helmetAccessories": ("HelmetAccessory", "HelmetAccessoryHolder", "HEAD"),
     "armorAddons": ("OuterClothingAccessory", "OuterClothingAccessoryHolder", "OUTERCLOTHING"),
+    "uniformAddons": ("UniformAccessory", "UniformAccessoryHolder", ""),
 }
 BODY_PARTS = {"Chest": "Chest", "Head": "Head", "Eyes": "Eyes", "Snout": "Face",
               "LArm": "Left arm", "RArm": "Right arm", "LHand": "Left hand", "RHand": "Right hand",
@@ -90,7 +92,7 @@ def load_prototypes():
                         proto = {k: v for k, v in proto.items() if k in
                                  ("id", "parent", "abstract", "name", "description", "source", "components")}
                         proto["components"] = [c for c in proto.get("components", []) if c.get("type") in
-                                               ("Clothing", "Sprite", "HideLayerClothing", "ItemCamouflage", "RMCClothingFoldable", "FoldableClothing", "Item", "Gun", "MeleeWeapon", "Wieldable", "HelmetAccessory", "HelmetAccessoryHolder", "OuterClothingAccessory", "OuterClothingAccessoryHolder")]
+                                               ("Clothing", "Sprite", "HideLayerClothing", "ItemCamouflage", "RMCClothingFoldable", "FoldableClothing", "Item", "Gun", "MeleeWeapon", "Wieldable", "HelmetAccessory", "HelmetAccessoryHolder", "OuterClothingAccessory", "OuterClothingAccessoryHolder", "UniformAccessory", "UniformAccessoryHolder", "RankChanger")]
                         entities[proto["id"]] = proto
                     elif proto.get("type") == "marking":
                         markings[proto["id"]] = proto
@@ -198,6 +200,12 @@ def build():
 
         def accessory_layers(slot, rsi=None, toggled=False):
             component = comp[ACCESSORIES[slot][0]]
+            if slot == "uniformAddons":
+                if component.get("hidden", False):
+                    return []
+                spec = component.get("playerSprite") or {"sprite": sprite.get("sprite") or "_RMC14/Objects/Medals/bronze.rsi", "state": "equipped"}
+                layer = sprites.layer(rsi or spec.get("sprite"), spec.get("state"))
+                return [layer] if layer else []
             spec = component.get("toggledRsi") if toggled else component.get("rsi")
             if not isinstance(spec, dict):
                 return []
@@ -262,8 +270,8 @@ def build():
         prefixes = [v.get("prefix") for v in comp.get("RMCClothingFoldable", {}).get("types", [])]
         prefixes.append(comp.get("FoldableClothing", {}).get("foldedEquippedPrefix"))
         for prefix in dict.fromkeys(p for p in prefixes if p):
-            reveal = next((v.get("revealLayers", []) for v in comp.get("RMCClothingFoldable", {}).get("types", []) if v.get("prefix") == prefix), [])
-            variants.append({"name": prefix.title(), "layers": {slot: layers[slot] if slot in HANDS or slot in ACCESSORIES else get_layers(slot, prefix=prefix) for slot in slots}, "reveal": reveal})
+            folded = next((v for v in comp.get("RMCClothingFoldable", {}).get("types", []) if v.get("prefix") == prefix), {})
+            variants.append({"name": prefix.title(), "layers": {slot: layers[slot] if slot in HANDS or slot in ACCESSORIES else get_layers(slot, prefix=prefix) for slot in slots}, "reveal": folded.get("revealLayers", []), "hideAccessories": folded.get("hideAccessories", False)})
         for slot in accessory_slots:
             if comp[ACCESSORIES[slot][0]].get("toggledRsi"):
                 toggled = accessory_layers(slot, toggled=True)
@@ -281,6 +289,10 @@ def build():
         for group, (_, component, default_slot) in ACCESSORIES.items():
             if component in comp:
                 holder = comp[component]
+                if group == "uniformAddons":
+                    holders[group] = {"slots": [slot for slot in slots if slot not in ACCESSORIES and slot not in HANDS],
+                                      "categories": holder.get("allowedCategories") or [], "hidden": holder.get("hideAccessories", False)}
+                    continue
                 holder_flags = set(re.split(r"[, |]+", str(holder.get("slot", default_slot)).upper()))
                 holders[group] = {"slots": [slot for slot in slots if SLOTS[slot][1] in holder_flags],
                                   "isHat": holder.get("isHat", True)}
@@ -289,6 +301,12 @@ def build():
                       "slots": slots, "layers": layers, "icon": icon, "variants": variants,
                       "clothing": "Clothing" in comp, "weapon": weapon,
                       "accessoryHolders": holders,
+                      "uniformAccessory": {"category": comp["UniformAccessory"].get("category", "Other"),
+                                           "kind": "Rank" if "RankChanger" in comp else comp["UniformAccessory"].get("category", "Other"),
+                                           "hidden": comp["UniformAccessory"].get("hidden", False),
+                                           "hiddenByJacketRolling": comp["UniformAccessory"].get("hiddenByJacketRolling", False),
+                                           "layerKeys": comp["UniformAccessory"].get("layerKeys") or [],
+                                           "limit": comp["UniformAccessory"].get("limit", 0)} if "UniformAccessory" in comp else None,
                       "hide": hidden.get("slots", []), "hideBySlot": hidden.get("layers", {})})
     customization = {}
     for id, marking in markings.items():
@@ -329,6 +347,7 @@ def build():
     report = {"clothingPrototypes": sum(i["clothing"] for i in items), "weaponPrototypes": sum(i["weapon"] for i in items),
               "helmetAccessories": sum("helmetAccessories" in i["slots"] for i in items),
               "armorAddons": sum("armorAddons" in i["slots"] for i in items),
+              "uniformAddons": sum("uniformAddons" in i["slots"] for i in items),
               "totalPrototypes": len(items), "sprites": len(sprites.cache),
               "noHumanOverlay": [i["id"] for i in items if not any(i["layers"].values())],
               "noSupportedSlot": [i["id"] for i in items if not i["slots"]]}

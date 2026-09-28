@@ -116,6 +116,28 @@ class CatalogTests(unittest.TestCase):
             actual = extracted.crop((direction * w, 0, (direction + 1) * w, h))
             self.assertIsNone(ImageChops.difference(expected, actual).getbbox())
 
+    def test_uniform_addons_categories_and_visibility(self):
+        for id, kind in [("AU14PatchUSCM", "Patch"), ("AU14ChevronUSCMSergeant", "Rank"),
+                         ("CMU14ChevronLACNSailor", "Rank"), ("RMCAlphaArmband", "Armband"), ("RMCMedalBronze", "Medal")]:
+            item = self.items[id]
+            self.assertIn("uniformAddons", item["slots"], id)
+            self.assertEqual(item["uniformAccessory"]["kind"], kind)
+            self.assertTrue(item["layers"]["uniformAddons"], id)
+        self.assertEqual(self.items["AU14ChevronUSCMSergeant"]["uniformAccessory"]["category"], "Armband")
+        self.assertTrue(self.items["AU14PatchUSCM"]["uniformAccessory"]["hiddenByJacketRolling"])
+        holder = self.items["JumpsuitMarine"]["accessoryHolders"]["uniformAddons"]
+        self.assertIn("jumpsuit", holder["slots"])
+        self.assertIn("Armband", holder["categories"])
+        self.assertIn("Patch", holder["categories"])
+        self.assertTrue(next(v for v in self.items["JumpsuitMarine"]["variants"] if v["name"] == "Jacket")["hideAccessories"])
+        self.assertEqual(self.items["AU14PatchUSCM"]["layers"]["uniformAddons"][0]["w"], 32)
+        medal = self.items["RMCMedalBase"]
+        self.assertTrue(medal["layers"]["uniformAddons"], "Medals without explicit playerSprite use the equipped state")
+        hidden = [item for item in self.items.values() if (item.get("uniformAccessory") or {}).get("hidden")]
+        self.assertTrue(hidden)
+        for item in hidden:
+            self.assertFalse(item["layers"]["uniformAddons"], item["id"])
+
 
 if __name__ == "__main__":
     unittest.main()
