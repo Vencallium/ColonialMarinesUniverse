@@ -50,6 +50,14 @@ frames, attribution metadata, coverage report, and source code license.
 - Guns and melee weapons in independent left/right hand slots using their
   actual in-hand sprites. Available two-handed poses clear the other hand.
   Use **Equip in** to choose a hand or another compatible slot.
+- Helmet accessories and armor add-ons from both resource libraries, including
+  LACN BK-9 helmet parts and BL-1 armor pieces. Choose their equipment categories
+  to add several pieces, then select a piece in the added list to change its
+  camouflage or available toggle style. Remove pieces individually or clear the
+  outfit. They render above compatible equipped headgear/armor and rotate with
+  the character. Unsupported gear leaves the pieces selected with a notice.
+  The **LACN gear** filter includes the updated uniforms, armor, headgear,
+  flight gear, webbing, weapons, and accessories.
 - Four-direction sprite rotation with buttons, arrow keys when the preview is
   focused, or horizontal dragging/swiping. Integer zoom and transparent PNG export.
 - Full bright, natural daylight, warm indoor, night, and emergency-red lighting,
@@ -58,7 +66,8 @@ frames, attribution metadata, coverage report, and source code license.
   a reproduction of the game engine's dynamic lighting. Full bright at 100%
   preserves the original rendered sprite colors.
 - All non-abstract entities with an inherited `Clothing` component, plus
-  holdable entities with `Gun` or `MeleeWeapon`, from both
+  holdable entities with `Gun` or `MeleeWeapon`, and entities with
+  `HelmetAccessory` or `OuterClothingAccessory`, from both
   `Resources/Prototypes` and `Content.CMU/Resources/Prototypes`. This includes
   equipment such as belts, weapons, and pocket items. An item with no compatible
   human inventory slot cannot be equipped; see `build-report.json`.
@@ -68,8 +77,8 @@ frames, attribution metadata, coverage report, and source code license.
 
 This is a static appearance preview, not the game engine. It renders the first
 animation frame. Items that have no human worn overlay remain selectable and
-show a notice. Runtime systems such as armor attachments, squad patches, powered
-lights, toggled visors, shader effects, and inventory restrictions
+show a notice. Runtime systems such as squad patches, powered
+lights, shader effects, and inventory restrictions
 beyond slot compatibility are not simulated. Camouflage and folding styles are
 individual alternatives, not combinable runtime states. Other species are not
 currently rendered. A browser can optionally expose the validated `equip_clothing`

@@ -5,8 +5,9 @@ const images = new Map();
 const directions = [0, 2, 1, 3]; // Clockwise: south, east, north, west; RSI uses S,N,E,W.
 const facing = ['SOUTH', 'EAST', 'NORTH', 'WEST'];
 const views = ['FRONT', 'LEFT SIDE', 'BACK', 'RIGHT SIDE'];
-const state = { slot: 'jumpsuit', equipped: {}, markings: [], direction: 0, page: 0 };
+const state = { slot: 'jumpsuit', equipped: {}, attachments: { helmetAccessories: [], armorAddons: [] }, focusedAttachment: {}, markings: [], direction: 0, page: 0 };
 const hands = ['leftHand', 'rightHand'];
+const attachmentParents = { helmetAccessories: 'head', armorAddons: 'outerClothing' };
 const picker = { kind: 'Hair', page: 0, version: 0 };
 let data, byId, renderVersion = 0;
 const pageSize = 6;
@@ -69,11 +70,21 @@ async function drawLayer(ctx, layer, direction, tint, displacement) {
   ctx.drawImage(scratch, (ctx.canvas.width - layer.w * sx) / 2 + ox * 32,
     (ctx.canvas.height - layer.h * sy) / 2 - oy * 32, layer.w * sx, layer.h * sy);
 }
-function selectedLayers(slot) {
-  const selection = state.equipped[slot];
+function selectedEntry(slot) {
+  return slot in attachmentParents
+    ? state.attachments[slot].find(entry => entry.id === state.focusedAttachment[slot]) || state.attachments[slot].at(-1)
+    : state.equipped[slot];
+}
+function selectedLayers(slot, selection = selectedEntry(slot)) {
   if (!selection) return [];
   const item = byId.get(selection.id);
   return (selection.variant >= 0 ? item.variants[selection.variant].layers : item.layers)[slot] || [];
+}
+function attachmentHolder(group) {
+  const slot = attachmentParents[group];
+  const parent = state.equipped[slot];
+  const holder = parent && byId.get(parent.id).accessoryHolders?.[group];
+  return holder?.slots.includes(slot) ? holder : null;
 }
 function allowsBody(marking) {
   const sexes = Array.isArray(marking.sex) ? marking.sex : marking.sex ? [marking.sex] : [];
@@ -145,7 +156,17 @@ async function render() {
     }
   };
   const part = (key, tint, markingPart) => { plans.push([data.body[key], tint]); if (markingPart) bodyMarks(markingPart); };
-  const equipment = slot => selectedLayers(slot).forEach(layer => plans.push([layer, null, body === 'f' && slot === 'jumpsuit' ? data.body.femaleDisplacement : null]));
+  const equipment = slot => {
+    selectedLayers(slot).forEach(layer => plans.push([layer, null, body === 'f' && slot === 'jumpsuit' ? data.body.femaleDisplacement : null]));
+    for (const [group, parentSlot] of Object.entries(attachmentParents)) {
+      if (parentSlot !== slot) continue;
+      const holder = attachmentHolder(group);
+      if (!holder) continue;
+      for (const selected of state.attachments[group]) {
+        selectedLayers(group, selected).forEach(layer => plans.push([holder.isHat && layer.hat ? layer.hat : layer]));
+      }
+    }
+  };
   const marking = (key, tint) => {
     if (hidden.has(key)) return;
     const item = data.customization[key]?.find(m => m.id === $(key).value);
@@ -169,7 +190,7 @@ async function render() {
     applyLighting(ctx);
     context.clearRect(0, 0, 96, 96); context.drawImage(frame, 0, 0);
     $('facing').textContent = facing[state.direction]; $('direction-label').textContent = views[state.direction];
-    $('equipped-count').textContent = `${Object.keys(state.equipped).length} items equipped`;
+    $('equipped-count').textContent = `${Object.keys(state.equipped).length + Object.values(state.attachments).flat().length} items equipped`;
     $('export').disabled = false;
   } catch (error) { status(`Preview incomplete: ${error.message}. Reload to retry.`); }
 }
@@ -200,13 +221,14 @@ function equipmentUI() {
     const button = document.createElement('button');
     button.className = 'slot' + (state.slot === slot.id ? ' active' : '');
     button.setAttribute('aria-pressed', String(state.slot === slot.id));
-    const selected = state.equipped[slot.id];
+    const selected = selectedEntry(slot.id);
     const item = selected && byId.get(selected.id);
-    button.setAttribute('aria-label', `${slot.name}: ${item?.name || 'empty'}`);
+    const summary = slot.multiple && selected ? `${state.attachments[slot.id].length} added` : item?.name || 'empty';
+    button.setAttribute('aria-label', `${slot.name}: ${summary}`);
     const picture = document.createElement('canvas'); void icon(picture, item);
     const text = document.createElement('span'); text.className = 'slot-text';
     const name = document.createElement('strong'); name.textContent = slot.name;
-    const label = document.createElement('small'); label.textContent = item?.name || 'Empty';
+    const label = document.createElement('small'); label.textContent = slot.multiple && selected ? summary : item?.name || 'Empty';
     text.append(name, label); button.append(picture, text);
     button.onclick = () => { state.slot = slot.id; state.page = 0; $('search-scope').value = 'slot'; $('search').value = ''; refresh(); };
     $('equipment').append(button);
@@ -222,7 +244,10 @@ function equip(id, slot = state.slot) {
     }
   }
   state.slot = slot;
-  state.equipped[slot] = { id, variant: -1 };
+  if (slot in attachmentParents) {
+    if (!state.attachments[slot].some(entry => entry.id === id)) state.attachments[slot].push({ id, variant: -1 });
+    state.focusedAttachment[slot] = id;
+  } else state.equipped[slot] = { id, variant: -1 };
   status(`${item.name} equipped in ${data.slots.find(s => s.id === slot).name}.`);
   refresh();
 }
@@ -231,7 +256,7 @@ function catalogUI() {
   const source = $('collection').value;
   const allSlots = $('search-scope').value === 'all';
   const items = data.items.filter(item => (allSlots || item.slots.includes(state.slot))
-    && (source === 'all' || collection(item) === source)
+    && (source === 'all' || (source === 'LACN' ? /lacn/i.test(`${item.id} ${item.name} ${item.source}`) : collection(item) === source))
     && `${item.name} ${item.id}`.toLowerCase().includes(query));
   const pages = Math.max(1, Math.ceil(items.length / pageSize));
   state.page = Math.min(state.page, pages - 1);
@@ -242,7 +267,7 @@ function catalogUI() {
   $('catalog').replaceChildren();
   for (const item of items.slice(state.page * pageSize, (state.page + 1) * pageSize)) {
     const button = document.createElement('button');
-    const selected = Object.values(state.equipped).some(equipped => equipped.id === item.id);
+    const selected = [...Object.values(state.equipped), ...Object.values(state.attachments).flat()].some(equipped => equipped.id === item.id);
     button.className = 'item' + (selected ? ' selected' : '');
     button.setAttribute('aria-pressed', String(selected)); button.title = item.id;
     const picture = document.createElement('canvas'); void icon(picture, item);
@@ -262,13 +287,20 @@ function catalogUI() {
 }
 function detailsUI() {
   const panel = $('item-detail'); panel.replaceChildren();
-  const selected = state.equipped[state.slot];
+  const selected = selectedEntry(state.slot);
   if (!selected) { panel.textContent = 'Select an item to equip it.'; return; }
   const item = byId.get(selected.id);
   const name = document.createElement('strong'); name.textContent = item.name;
   const id = document.createElement('code'); id.textContent = item.id;
   const description = document.createElement('p'); description.textContent = item.description;
   panel.append(name, id, description);
+  if (state.slot in attachmentParents) {
+    const hint = document.createElement('p'); hint.className = 'notice';
+    hint.textContent = attachmentHolder(state.slot)
+      ? 'Added above the equipped gear. Choose more pieces to combine them; the last added piece is drawn on top.'
+      : `Added to your outfit. Equip compatible ${state.slot === 'helmetAccessories' ? 'headgear' : 'armor'} to show it in the preview.`;
+    panel.append(hint);
+  }
   if (item.slots.length > 1) {
     const label = document.createElement('label'); label.textContent = 'Equip in';
     const select = document.createElement('select');
@@ -299,10 +331,41 @@ function detailsUI() {
     panel.append(notice);
   }
   const remove = document.createElement('button'); remove.textContent = 'Remove from slot';
-  remove.onclick = () => { delete state.equipped[state.slot]; status(`${item.name} removed.`); refresh(); };
+  remove.onclick = () => { removeItem(state.slot, item.id); };
   panel.append(remove);
 }
-function refresh() { equipmentUI(); catalogUI(); detailsUI(); void render(); }
+function removeItem(slot, id) {
+  if (slot in attachmentParents) state.attachments[slot] = state.attachments[slot].filter(entry => entry.id !== id);
+  else delete state.equipped[slot];
+  status(`${byId.get(id).name} removed.`); refresh();
+}
+function attachmentsUI() {
+  const panel = $('chosen-accessories'); panel.replaceChildren();
+  for (const group of Object.keys(attachmentParents)) {
+    if (!state.attachments[group].length) continue;
+    const section = document.createElement('section'); section.className = 'accessory-group';
+    const title = document.createElement('h3'); title.textContent = data.slots.find(slot => slot.id === group).name;
+    const hint = document.createElement('p'); hint.className = 'accessory-hint';
+    hint.textContent = attachmentHolder(group) ? 'Select a piece to change its style.' : `Waiting for compatible ${group === 'helmetAccessories' ? 'headgear' : 'armor'}.`;
+    section.append(title, hint);
+    for (const selected of state.attachments[group]) {
+      const item = byId.get(selected.id);
+      const entry = document.createElement('div'); entry.className = 'accessory-entry'; entry.dataset.id = item.id;
+      const button = document.createElement('button'); button.className = 'accessory-select';
+      button.setAttribute('aria-pressed', String(state.slot === group && selectedEntry(group) === selected));
+      const picture = document.createElement('canvas'); void icon(picture, item);
+      const text = document.createElement('span'); text.textContent = item.name;
+      const style = document.createElement('small'); style.textContent = item.variants[selected.variant]?.name || 'Default';
+      text.append(style); button.append(picture, text);
+      button.onclick = () => { state.slot = group; state.focusedAttachment[group] = selected.id; refresh(); };
+      const remove = document.createElement('button'); remove.textContent = '✕'; remove.setAttribute('aria-label', `Remove ${item.name}`);
+      remove.onclick = () => removeItem(group, item.id);
+      entry.append(button, remove); section.append(entry);
+    }
+    panel.append(section);
+  }
+}
+function refresh() { equipmentUI(); attachmentsUI(); catalogUI(); detailsUI(); void render(); }
 function rotate(delta) { state.direction = (state.direction + delta + 4) % 4; void render(); }
 function customizationUI() {
   for (const key of ['Hair', 'FacialHair', 'UndergarmentTop', 'UndergarmentBottom']) {
@@ -464,7 +527,7 @@ async function start() {
     void render();
   };
   $('lighting').onchange = $('brightness').oninput = updateLighting;
-  $('clear').onclick = () => { state.equipped = {}; status('Outfit cleared.'); refresh(); };
+  $('clear').onclick = () => { state.equipped = {}; state.attachments = { helmetAccessories: [], armorAddons: [] }; state.focusedAttachment = {}; status('Outfit cleared.'); refresh(); };
   $('export').onclick = async () => {
     await render();
     const output = document.createElement('canvas'); output.width = 768; output.height = 768;
@@ -473,7 +536,7 @@ async function start() {
     link.href = output.toDataURL('image/png'); link.click(); status('Character exported as a transparent PNG.');
   };
   updateAppearanceButtons(); markingsUI();
-  refresh(); status(`${data.items.length.toLocaleString()} clothing & weapon prototypes · Four-direction preview`);
+  refresh(); status(`${data.items.length.toLocaleString()} clothing, weapon & accessory prototypes · Four-direction preview`);
   if (document.modelContext?.registerTool) {
     const lifecycle = new AbortController();
     window.addEventListener('pagehide', () => lifecycle.abort(), { once: true });

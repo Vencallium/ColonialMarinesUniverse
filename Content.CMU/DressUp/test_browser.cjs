@@ -82,6 +82,59 @@ const url = process.argv[3] || 'http://127.0.0.1:4173';
       catch { return true; }
     });
     assert.ok(invalid, 'Wrong-slot tool input is rejected');
+    // Accessories stack, retain independent styles, and follow their equipped parent.
+    await page.locator('#search-scope').selectOption('all');
+    await page.locator('#collection').selectOption('LACN');
+    await page.locator('#search').fill('CMULACNServiceUniform');
+    assert.equal(await page.locator('#result-count').innerText(), '1');
+    await page.locator('button.item[title="CMULACNServiceUniform"]').click();
+    const equip = (prototypeId, slot) => page.evaluate(input => window.dressupTestTool.execute(input), { prototypeId, slot });
+    await equip('AU14LACNUniform', 'jumpsuit');
+    await equip('AU14LACNHelmetStandard', 'head');
+    await equip('AU14LACNArmorStandard', 'outerClothing');
+    const baseGear = await pixels();
+    await equip('CMULACNHelmetGarbCombatVisor', 'helmetAccessories');
+    assert.notEqual(await pixels(), baseGear, 'Helmet accessories appear above the helmet');
+    await equip('CMULACNHelmetGarbComms', 'helmetAccessories');
+    await equip('CMULACNHelmetGarbNightVision', 'helmetAccessories');
+    const raised = await pixels();
+    await page.locator('#item-detail label').filter({ hasText: 'Style' }).locator('select').selectOption({ label: 'Lowered / activated' });
+    await page.waitForFunction(old => document.querySelector('#character').toDataURL() !== old, raised);
+    const beforeArmorAddons = await pixels();
+    for (const id of ['CMULACNArmorGarbArms', 'CMULACNArmorGarbCollar', 'CMULACNArmorGarbLegs', 'CMULACNArmorGarbPauldrons', 'CMULACNArmorGarbPlate']) await equip(id, 'armorAddons');
+    assert.notEqual(await pixels(), beforeArmorAddons, 'Several armor pieces render together');
+    assert.equal(await page.locator('#chosen-accessories .accessory-entry').count(), 8);
+    await equip('CMULACNArmorGarbPlate', 'armorAddons');
+    assert.equal(await page.locator('#chosen-accessories .accessory-entry').count(), 8, 'Selecting an added piece does not duplicate it or reset its style');
+    const jungle = await pixels();
+    await page.locator('#item-detail label').filter({ hasText: 'Style' }).locator('select').selectOption({ label: 'Desert' });
+    await page.waitForFunction(old => document.querySelector('#character').toDataURL() !== old, jungle);
+    const combined = await pixels();
+    await equip('CMULACNArmorGarbPlate', 'armorAddons');
+    assert.equal(await pixels(), combined, 'Selecting an added piece preserves its camouflage style');
+    for (const face of ['EAST', 'NORTH', 'WEST', 'SOUTH']) {
+      await page.locator('#rotate-right').click();
+      await page.waitForFunction(value => document.querySelector('#facing').textContent === value, face);
+      if (face !== 'SOUTH') assert.notEqual(await pixels(), combined);
+    }
+    assert.equal(await pixels(), combined, 'A full turn preserves the combined accessory outfit');
+    await page.locator('#chosen-accessories [data-id="CMULACNHelmetGarbNightVision"] .accessory-select').click();
+    assert.equal(await page.locator('#item-detail label').filter({ hasText: 'Style' }).locator('select').inputValue(), '0', 'Changing another piece keeps the visor toggle');
+    await page.screenshot({ path: path.join(qa, 'lacn-accessories.png'), fullPage: true });
+    await equip('AU14LACNHelmetStandard', 'head');
+    await page.getByRole('button', { name: 'Remove from slot', exact: true }).click();
+    await page.waitForFunction(old => document.querySelector('#character').toDataURL() !== old, combined);
+    assert.equal(await page.locator('#chosen-accessories .accessory-entry').count(), 8, 'Removing headgear preserves accessory choices');
+    assert.match(await page.locator('#chosen-accessories').innerText(), /Waiting for compatible headgear/);
+    await equip('AU14LACNHelmetStandard', 'head');
+    assert.equal(await pixels(), combined, 'Re-equipping compatible headgear restores selected accessories');
+    await page.locator('#chosen-accessories [data-id="CMULACNArmorGarbPlate"] > button:last-child').click();
+    assert.equal(await page.locator('#chosen-accessories .accessory-entry').count(), 7);
+    await page.waitForFunction(old => document.querySelector('#character').toDataURL() !== old, combined);
+    await page.locator('#clear').click();
+    await page.waitForFunction(() => document.querySelector('#equipped-count').textContent === '0 items equipped');
+    assert.equal(await page.locator('#chosen-accessories .accessory-entry').count(), 0);
+    await equip('JumpsuitMarine', 'jumpsuit');
     // Global search crosses both collections and equipment slots.
     await page.locator('#search-scope').selectOption('all');
     assert.equal(await page.locator('#collection').inputValue(), 'all');
@@ -160,7 +213,7 @@ const url = process.argv[3] || 'http://127.0.0.1:4173';
     await page.goto(`${url}/credits.html`);
     await page.waitForFunction(() => document.querySelectorAll('#credits section').length > 0);
     assert.deepEqual(errors, [], 'No browser exceptions or missing local assets');
-    console.log('PASS: global search, visual hair/facial pickers, markings/colors/occlusion, both hands and wielded poses, enlarged sprites, rotation, export, responsive layouts, and credits.');
+    console.log('PASS: LACN filter and new gear, stacked helmet/armor accessories, independent camouflage/toggles, parent removal/restoration, global search, hair/facial previews, markings, weapons, lighting, rotation, export, responsive layouts, and credits.');
   } finally {
     await browser.close();
   }

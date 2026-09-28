@@ -86,6 +86,36 @@ class CatalogTests(unittest.TestCase):
         self.assertEqual(chest["TattooHiveChest"]["layers"][0]["colorMode"], "TattooColoring")
         self.assertIn("ScarEyeRight", {m["id"] for m in self.catalog["customization"]["Head"]})
 
+    def test_accessories_and_latest_lacn_artwork(self):
+        helmet = self.items["AU14LACNHelmetStandard"]
+        self.assertIn("head", helmet["accessoryHolders"]["helmetAccessories"]["slots"])
+        self.assertFalse(helmet["accessoryHolders"]["helmetAccessories"]["isHat"])
+        armor = self.items["AU14LACNArmorStandard"]
+        self.assertIn("outerClothing", armor["accessoryHolders"]["armorAddons"]["slots"])
+        for id in ["CMULACNArmorGarbArms", "CMULACNArmorGarbCollar", "CMULACNArmorGarbLegs", "CMULACNArmorGarbPauldrons", "CMULACNArmorGarbPlate"]:
+            item = self.items[id]
+            self.assertEqual(item["slots"], ["armorAddons"])
+            self.assertTrue(item["layers"]["armorAddons"], id)
+            desert = next(v for v in item["variants"] if v["name"] == "Desert")
+            self.assertNotEqual(item["layers"]["armorAddons"], desert["layers"]["armorAddons"])
+        nvg = self.items["CMULACNHelmetGarbNightVision"]
+        self.assertTrue(nvg["layers"]["helmetAccessories"])
+        toggled = next(v for v in nvg["variants"] if "activated" in v["name"])
+        self.assertNotEqual(nvg["layers"]["helmetAccessories"], toggled["layers"]["helmetAccessories"])
+        layer = armor["layers"]["outerClothing"][0]
+        source = ROOT / "Content.CMU/Resources/Textures/CMU14/Clothing/LACN/LACNRedux/Infantry/Jungle/LACNarmorvest.rsi"
+        meta = json.loads((source / "meta.json").read_text(encoding="utf-8"))
+        state = next(s for s in meta["states"] if s["name"] == "equipped-OUTERCLOTHING")
+        original = Image.open(source / "equipped-OUTERCLOTHING.png").convert("RGBA")
+        extracted = Image.open(OUT / layer["src"]).convert("RGBA")
+        for direction in range(4):
+            index = sum(len(d) for d in state.get("delays", [[1]] * 4)[:direction])
+            w, h = layer["w"], layer["h"]
+            x, y = index % (original.width // w) * w, index // (original.width // w) * h
+            expected = original.crop((x, y, x + w, y + h))
+            actual = extracted.crop((direction * w, 0, (direction + 1) * w, h))
+            self.assertIsNone(ImageChops.difference(expected, actual).getbbox())
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -33,6 +33,12 @@ SLOTS = {
     "pocket2": ("Right pocket", "POCKET", "POCKET2"),
     "leftHand": ("Left hand", "LEFTHAND", "inhand-left"),
     "rightHand": ("Right hand", "RIGHTHAND", "inhand-right"),
+    "helmetAccessories": ("Helmet accessories", "HELMETACCESSORY", ""),
+    "armorAddons": ("Armor add-ons", "ARMORADDON", ""),
+}
+ACCESSORIES = {
+    "helmetAccessories": ("HelmetAccessory", "HelmetAccessoryHolder", "HEAD"),
+    "armorAddons": ("OuterClothingAccessory", "OuterClothingAccessoryHolder", "OUTERCLOTHING"),
 }
 BODY_PARTS = {"Chest": "Chest", "Head": "Head", "Eyes": "Eyes", "Snout": "Face",
               "LArm": "Left arm", "RArm": "Right arm", "LHand": "Left hand", "RHand": "Right hand",
@@ -84,7 +90,7 @@ def load_prototypes():
                         proto = {k: v for k, v in proto.items() if k in
                                  ("id", "parent", "abstract", "name", "description", "source", "components")}
                         proto["components"] = [c for c in proto.get("components", []) if c.get("type") in
-                                               ("Clothing", "Sprite", "HideLayerClothing", "ItemCamouflage", "RMCClothingFoldable", "FoldableClothing", "Item", "Gun", "MeleeWeapon", "Wieldable")]
+                                               ("Clothing", "Sprite", "HideLayerClothing", "ItemCamouflage", "RMCClothingFoldable", "FoldableClothing", "Item", "Gun", "MeleeWeapon", "Wieldable", "HelmetAccessory", "HelmetAccessoryHolder", "OuterClothingAccessory", "OuterClothingAccessoryHolder")]
                         entities[proto["id"]] = proto
                     elif proto.get("type") == "marking":
                         markings[proto["id"]] = proto
@@ -177,7 +183,8 @@ def build():
         proto = resolve(id)
         comp = {c["type"]: c for c in proto.get("components", [])}
         weapon = "Item" in comp and ("Gun" in comp or "MeleeWeapon" in comp)
-        if proto["abstract"] or ("Clothing" not in comp and not weapon):
+        accessory_slots = [slot for slot, (component, _, _) in ACCESSORIES.items() if component in comp]
+        if proto["abstract"] or ("Clothing" not in comp and not weapon and not accessory_slots):
             continue
         clothing, sprite = comp.get("Clothing", {}), comp.get("Sprite", {})
         flags = clothing.get("slots", [])
@@ -185,10 +192,26 @@ def build():
             flags = re.split(r"[, |]+", flags)
         flags = {str(f).upper() for f in flags}
         slots = [k for k, v in SLOTS.items() if v[1] in flags]
+        slots.extend(accessory_slots)
         base = clothing.get("sprite") or sprite.get("sprite")
         visuals = clothing.get("clothingVisuals", {})
 
+        def accessory_layers(slot, rsi=None, toggled=False):
+            component = comp[ACCESSORIES[slot][0]]
+            spec = component.get("toggledRsi") if toggled else component.get("rsi")
+            if not isinstance(spec, dict):
+                return []
+            layer = sprites.layer(rsi or spec.get("sprite"), spec.get("state"), offset=component.get("offset"))
+            if not layer:
+                return []
+            hat = component.get("hatToggledRsi" if toggled else "hatRsi")
+            if isinstance(hat, dict):
+                layer["hat"] = sprites.layer(rsi or hat.get("sprite"), hat.get("state"), offset=component.get("offset"))
+            return [layer]
+
         def get_layers(slot, rsi=base, prefix=None):
+            if slot in ACCESSORIES:
+                return accessory_layers(slot, None if rsi == base else rsi)
             explicit = visuals.get(slot)
             if explicit is not None and rsi == base and prefix is None:
                 result = []
@@ -240,7 +263,12 @@ def build():
         prefixes.append(comp.get("FoldableClothing", {}).get("foldedEquippedPrefix"))
         for prefix in dict.fromkeys(p for p in prefixes if p):
             reveal = next((v.get("revealLayers", []) for v in comp.get("RMCClothingFoldable", {}).get("types", []) if v.get("prefix") == prefix), [])
-            variants.append({"name": prefix.title(), "layers": {slot: layers[slot] if slot in HANDS else get_layers(slot, prefix=prefix) for slot in slots}, "reveal": reveal})
+            variants.append({"name": prefix.title(), "layers": {slot: layers[slot] if slot in HANDS or slot in ACCESSORIES else get_layers(slot, prefix=prefix) for slot in slots}, "reveal": reveal})
+        for slot in accessory_slots:
+            if comp[ACCESSORIES[slot][0]].get("toggledRsi"):
+                toggled = accessory_layers(slot, toggled=True)
+                if toggled:
+                    variants.append({"name": "Lowered / activated", "layers": {slot: toggled}})
         if weapon and "Wieldable" in comp:
             wielded = {slot: inhand_layers(slot, prefix=comp["Wieldable"].get("wieldedInhandPrefix") or "wielded") for slot in HANDS}
             if any(wielded.values()):
@@ -249,10 +277,18 @@ def build():
         name = names.get(f"ent-{id}") or proto.get("name") or id
         if name == "item":
             name = re.sub(r"(?<=[a-z])(?=[A-Z])", " ", id)
+        holders = {}
+        for group, (_, component, default_slot) in ACCESSORIES.items():
+            if component in comp:
+                holder = comp[component]
+                holder_flags = set(re.split(r"[, |]+", str(holder.get("slot", default_slot)).upper()))
+                holders[group] = {"slots": [slot for slot in slots if SLOTS[slot][1] in holder_flags],
+                                  "isHat": holder.get("isHat", True)}
         items.append({"id": id, "name": name,
                       "description": proto.get("description", ""), "source": entities[id]["source"],
                       "slots": slots, "layers": layers, "icon": icon, "variants": variants,
                       "clothing": "Clothing" in comp, "weapon": weapon,
+                      "accessoryHolders": holders,
                       "hide": hidden.get("slots", []), "hideBySlot": hidden.get("layers", {})})
     customization = {}
     for id, marking in markings.items():
@@ -286,18 +322,20 @@ def build():
     body["eyes"] = sprites.layer("Mobs/Customization/eyes.rsi", "eyes")
     body["femaleDisplacement"] = sprites.layer("Mobs/Species/Human/displacement.rsi", "jumpsuit-female")
     catalog = {"items": items, "customization": customization, "body": body, "bodyParts": BODY_PARTS,
-               "slots": [{"id": k, "name": v[0], "flag": v[1]} for k, v in SLOTS.items()]}
+               "slots": [{"id": k, "name": v[0], "flag": v[1], "multiple": k in ACCESSORIES} for k, v in SLOTS.items()]}
     (OUT / "catalog.json").write_text(json.dumps(catalog, separators=(",", ":")), encoding="utf-8")
     (OUT / "credits.json").write_text(json.dumps(sprites.credits, indent=2), encoding="utf-8")
     shutil.copy2(ROOT / "LICENSE", OUT / "CODE-LICENSE.txt")
     report = {"clothingPrototypes": sum(i["clothing"] for i in items), "weaponPrototypes": sum(i["weapon"] for i in items),
+              "helmetAccessories": sum("helmetAccessories" in i["slots"] for i in items),
+              "armorAddons": sum("armorAddons" in i["slots"] for i in items),
               "totalPrototypes": len(items), "sprites": len(sprites.cache),
               "noHumanOverlay": [i["id"] for i in items if not any(i["layers"].values())],
               "noSupportedSlot": [i["id"] for i in items if not i["slots"]]}
     (OUT / "build-report.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
     for path in (HERE / "web").iterdir():
         shutil.copy2(path, OUT / path.name)
-    print(f"Built {len(items)} clothing and weapon prototypes, {len(sprites.cache)} sprite states, "
+    print(f"Built {len(items)} clothing, weapon and accessory prototypes, {len(sprites.cache)} sprite states, "
           f"{sum(map(len, customization.values()))} customization choices. "
           f"{len(report['noHumanOverlay'])} items have no human overlay (listed in build-report.json).")
 

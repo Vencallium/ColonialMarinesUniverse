@@ -9,6 +9,16 @@
 .stage[data-lighting=night] { background-color: #0b1424; }
 .stage[data-lighting=emergency] { background-color: #301415; }
 [hidden] { display: none !important; }
+.accessory-hint { color: var(--muted); font-size: 13px; line-height: 1.5; margin: 12px 0; }
+#chosen-accessories { display: grid; gap: 16px; }
+.accessory-group { padding: 16px; border: 1px solid var(--line); border-radius: 5px; background: var(--panel); }
+.accessory-group h3 { font-size: 16px; font-weight: 500; }
+.accessory-entry { display: flex; gap: 8px; align-items: center; margin-top: 8px; min-width: 0; }
+.accessory-select { flex: 1; min-width: 0; display: flex; align-items: center; text-align: left; gap: 10px; padding: 6px; }
+.accessory-select canvas { width: 48px; height: 48px; flex-shrink: 0; image-rendering: pixelated; }
+.accessory-select span { font-size: 14px; overflow-wrap: anywhere; }
+.accessory-select small { display: block; color: var(--muted); font-size: 12px; margin-top: 4px; }
+.accessory-select[aria-pressed=true] { border-color: var(--accent); }
 .catalog { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .item { min-height: 188px; gap: 7px; }
 .item canvas { width: 96px; height: 96px; max-width: 100%; object-fit: contain; }
