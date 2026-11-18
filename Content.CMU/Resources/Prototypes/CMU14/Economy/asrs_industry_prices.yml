@@ -4,1942 +4,1474 @@
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice001
   product: "alexandrite"
-  price: 9
+  price: 15
 
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice002
   product: "alexandrite crystal"
-  price: 20
+  price: 10
 
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice003
   product: "alexandrite lens"
-  price: 7
+  price: 5.25
 
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice004
   product: "alexandrite powder"
-  price: 6.5
+  price: 4.88
 
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice005
   product: "Aluminum"
-  price: 35
+  price: 26.25
 
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice006
   product: "aluminum ingot"
-  price: 30
+  price: 22.5
 
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice007
   product: "aluminum ore"
-  price: 25
+  price: 12.5
 
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice008
   product: "aluminum powder"
-  price: 7.5
+  price: 5.62
 
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice009
   product: "aluminum sheet"
-  price: 35
+  price: 26.25
 
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice010
-  product: "anvil"
-  price: 140
+  product: "Apcelectronics"
+  price: 105
 
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice011
-  product: "Apcelectronics"
-  price: 140
+  product: "asbestos crystal"
+  price: 5
 
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice012
-  product: "asbestos crystal"
-  price: 10
+  product: "asbestos powder"
+  price: 3.38
 
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice013
-  product: "asbestos powder"
-  price: 4.5
+  product: "Au14 Concrete Bag"
+  price: 22.5
 
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice014
-  product: "assembler"
-  price: 830
+  product: "Au14 Tool Shovel"
+  price: 63.75
 
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice015
-  product: "Au14 Concrete Bag"
-  price: 30
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice016
-  product: "Au14 Tool Shovel"
-  price: 85
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice017
-  product: "autoclave"
-  price: 510
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice018
-  product: "automatic hydroponics tray"
-  price: 430
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice019
   product: "automation kit"
-  price: 200
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice020
-  product: "barrel stove"
-  price: 130
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice021
-  product: "battery bank"
-  price: 950
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice022
-  product: "battery buffer"
-  price: 1430
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice023
-  product: "beryllium crystal"
-  price: 20
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice024
-  product: "beryllium powder"
-  price: 6.5
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice025
-  product: "black stone fragment"
-  price: 8
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice026
-  product: "black stone powder"
-  price: 15
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice027
-  product: "branch"
-  price: 2
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice028
-  product: "brass condenser"
-  price: 300
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice029
-  product: "Brass Gas Pipe Bend"
-  price: 55
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice030
-  product: "Brass Gas Pipe Fourway"
-  price: 110
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice031
-  product: "Brass Gas Pipe Half"
-  price: 55
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice032
-  product: "Brass Gas Pipe Straight"
-  price: 55
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice033
-  product: "Brass Gas Pipe Tjunction"
-  price: 100
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice034
-  product: "brass ingot"
-  price: 40
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice035
-  product: "brass ingot mold for three"
-  price: 8.5
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice036
-  product: "brass mold"
-  price: 2
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice037
-  product: "brass parts"
-  price: 2
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice038
-  product: "brass pickaxe"
-  price: 140
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice039
-  product: "brass pipe"
-  price: 55
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice040
-  product: "brass pipe going down"
-  price: 55
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice041
-  product: "brass sheet"
-  price: 45
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice042
-  product: "brass sheet mold"
-  price: 8.5
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice043
-  product: "brass shovel"
-  price: 90
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice044
-  product: "brass sword"
-  price: 140
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice045
-  product: "Bread Plate"
-  price: 20
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice046
-  product: "Cable Hv"
-  price: 50
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice047
-  product: "Cable Mv"
-  price: 30
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice048
-  product: "cannery"
-  price: 570
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice049
-  product: "charger"
-  price: 300
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice050
-  product: "Cheese Bread"
-  price: 35
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice051
-  product: "Cheese Soup"
-  price: 30
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice052
-  product: "chemical bath"
-  price: 480
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice053
-  product: "chemical reactor"
-  price: 680
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice054
-  product: "chisel"
-  price: 35
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice055
-  product: "chrome ore"
-  price: 30
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice056
-  product: "chrome sheet"
-  price: 30
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice057
-  product: "chrome-plated steel sheet"
-  price: 50
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice058
-  product: "chromium ingot"
-  price: 25
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice059
-  product: "chromium powder"
-  price: 6
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice060
-  product: "cinnabar crystal"
-  price: 20
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice061
-  product: "cinnabar powder"
-  price: 6.5
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice062
-  product: "circuit assembler"
-  price: 690
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice063
-  product: "clay"
-  price: 5
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice064
-  product: "clay smeltery"
-  price: 160
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice065
-  product: "Cloth"
-  price: 5
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice066
-  product: "Coal"
-  price: 8
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice067
-  product: "cobalt ingot"
-  price: 30
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice068
-  product: "cobalt ore"
-  price: 45
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice069
-  product: "cobalt powder"
-  price: 7.5
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice070
-  product: "cobalt sheet"
-  price: 35
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice071
-  product: "coil of rope"
-  price: 20
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice072
-  product: "coke"
-  price: 15
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice073
-  product: "colony APC"
-  price: 220
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice074
-  product: "coltan crystal"
-  price: 25
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice075
-  product: "coltan powder"
-  price: 7.5
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice076
-  product: "complex assembly bench"
-  price: 1020
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice077
-  product: "compressor"
-  price: 510
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice078
-  product: "concrete mixer"
-  price: 570
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice079
-  product: "condenser"
-  price: 510
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice080
-  product: "conveyor belt"
-  price: 350
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice081
-  product: "cooking pot"
-  price: 100
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice082
-  product: "copper ingot"
-  price: 25
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice083
-  product: "copper ore"
-  price: 20
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice084
-  product: "copper powder"
-  price: 6.5
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice085
-  product: "copper sheet"
-  price: 30
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice086
-  product: "Cotton"
-  price: 5
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice087
-  product: "crucible"
-  price: 60
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice088
-  product: "diamond"
-  price: 45
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice089
-  product: "diamond dust"
-  price: 30
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice090
-  product: "diamond lens"
-  price: 25
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice091
-  product: "distillation tower"
-  price: 1140
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice092
-  product: "drive kit"
-  price: 90
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice093
-  product: "Durathread"
-  price: 35
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice094
-  product: "Electric Crowbar"
-  price: 170
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice095
-  product: "electric drill"
-  price: 570
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice096
-  product: "Electric Hammer"
-  price: 270
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice097
-  product: "Electric Pickaxe"
-  price: 390
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice098
-  product: "Electric Screwdriver"
   price: 150
 
 - type: cmuIndustryPrice
-  id: RUMCIndustryPrice099
-  product: "Electric Shovel"
-  price: 260
+  id: RUMCIndustryPrice016
+  product: "barrel stove"
+  price: 97.5
 
 - type: cmuIndustryPrice
-  id: RUMCIndustryPrice100
-  product: "electric smelter"
-  price: 690
+  id: RUMCIndustryPrice017
+  product: "beryllium crystal"
+  price: 10
 
 - type: cmuIndustryPrice
-  id: RUMCIndustryPrice101
-  product: "electric welder"
-  price: 210
+  id: RUMCIndustryPrice018
+  product: "beryllium powder"
+  price: 4.88
 
 - type: cmuIndustryPrice
-  id: RUMCIndustryPrice102
-  product: "Electric Wirecutters"
-  price: 200
+  id: RUMCIndustryPrice019
+  product: "black stone fragment"
+  price: 6
 
 - type: cmuIndustryPrice
-  id: RUMCIndustryPrice103
-  product: "Electric Wrench"
-  price: 180
+  id: RUMCIndustryPrice020
+  product: "black stone powder"
+  price: 11.25
 
 - type: cmuIndustryPrice
-  id: RUMCIndustryPrice104
-  product: "electrical panel"
-  price: 200
+  id: RUMCIndustryPrice021
+  product: "branch"
+  price: 1.5
 
 - type: cmuIndustryPrice
-  id: RUMCIndustryPrice105
-  product: "electrolyzer"
-  price: 390
+  id: RUMCIndustryPrice022
+  product: "Brass Gas Pipe Bend"
+  price: 41.25
 
 - type: cmuIndustryPrice
-  id: RUMCIndustryPrice106
-  product: "electromagnetic separator"
-  price: 400
+  id: RUMCIndustryPrice023
+  product: "Brass Gas Pipe Fourway"
+  price: 82.5
 
 - type: cmuIndustryPrice
-  id: RUMCIndustryPrice107
-  product: "electronics kit"
+  id: RUMCIndustryPrice024
+  product: "Brass Gas Pipe Half"
+  price: 41.25
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice025
+  product: "Brass Gas Pipe Straight"
+  price: 41.25
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice026
+  product: "Brass Gas Pipe Tjunction"
+  price: 75
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice027
+  product: "brass ingot"
+  price: 30
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice028
+  product: "brass ingot mold for three"
+  price: 6.38
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice029
+  product: "brass mold"
+  price: 1.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice030
+  product: "brass parts"
+  price: 1.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice031
+  product: "brass pickaxe"
+  price: 105
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice032
+  product: "brass pipe"
+  price: 41.25
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice033
+  product: "brass pipe going down"
+  price: 41.25
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice034
+  product: "brass sheet"
+  price: 33.75
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice035
+  product: "brass sheet mold"
+  price: 6.38
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice036
+  product: "brass shovel"
+  price: 67.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice037
+  product: "brass sword"
+  price: 105
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice038
+  product: "Bread Plate"
   price: 15
 
 - type: cmuIndustryPrice
-  id: RUMCIndustryPrice108
+  id: RUMCIndustryPrice039
+  product: "Cable Hv"
+  price: 37.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice040
+  product: "Cable Mv"
+  price: 22.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice041
+  product: "Cheese Bread"
+  price: 26.25
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice042
+  product: "Cheese Soup"
+  price: 22.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice043
+  product: "chisel"
+  price: 26.25
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice044
+  product: "chrome ore"
+  price: 15
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice045
+  product: "chrome sheet"
+  price: 22.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice046
+  product: "chrome-plated steel sheet"
+  price: 37.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice047
+  product: "chromium ingot"
+  price: 18.75
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice048
+  product: "chromium powder"
+  price: 4.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice049
+  product: "cinnabar crystal"
+  price: 10
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice050
+  product: "cinnabar powder"
+  price: 4.88
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice051
+  product: "clay"
+  price: 3.75
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice052
+  product: "Cloth"
+  price: 3.75
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice053
+  product: "Coal"
+  price: 6
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice054
+  product: "cobalt ingot"
+  price: 22.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice055
+  product: "cobalt ore"
+  price: 22.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice056
+  product: "cobalt powder"
+  price: 5.62
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice057
+  product: "cobalt sheet"
+  price: 26.25
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice058
+  product: "coil of rope"
+  price: 15
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice059
+  product: "coke"
+  price: 11.25
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice060
+  product: "coltan crystal"
+  price: 12.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice061
+  product: "coltan powder"
+  price: 5.62
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice062
+  product: "conveyor belt"
+  price: 262.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice063
+  product: "cooking pot"
+  price: 75
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice064
+  product: "copper ingot"
+  price: 18.75
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice065
+  product: "copper ore"
+  price: 10
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice066
+  product: "copper powder"
+  price: 4.88
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice067
+  product: "copper sheet"
+  price: 22.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice068
+  product: "Cotton"
+  price: 3.75
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice069
+  product: "crucible"
+  price: 45
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice070
+  product: "diamond"
+  price: 90
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice071
+  product: "diamond dust"
+  price: 22.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice072
+  product: "diamond lens"
+  price: 18.75
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice073
+  product: "drive kit"
+  price: 67.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice074
+  product: "Durathread"
+  price: 26.25
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice075
+  product: "Electric Crowbar"
+  price: 127.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice076
+  product: "Electric Hammer"
+  price: 202.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice077
+  product: "Electric Pickaxe"
+  price: 292.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice078
+  product: "Electric Screwdriver"
+  price: 112.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice079
+  product: "Electric Shovel"
+  price: 195
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice080
+  product: "electric welder"
+  price: 157.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice081
+  product: "Electric Wirecutters"
+  price: 150
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice082
+  product: "Electric Wrench"
+  price: 135
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice083
+  product: "electrical panel"
+  price: 150
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice084
+  product: "electronics kit"
+  price: 11.25
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice085
   product: "emerald"
+  price: 90
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice086
+  product: "emerald crystal"
+  price: 60
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice087
+  product: "emerald lens"
+  price: 18.75
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice088
+  product: "emerald powder"
+  price: 22.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice089
+  product: "empty mold"
+  price: 1.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice090
+  product: "fast conveyor belt"
+  price: 330
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice091
+  product: "fasteners kit"
+  price: 3.75
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice092
+  product: "fine gold wire"
+  price: 22.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice093
+  product: "fine silver wire"
+  price: 15
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice094
+  product: "flint striker"
+  price: 11.25
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice095
+  product: "fluid barrel"
+  price: 150
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice096
+  product: "fluorite crystal"
+  price: 7.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice097
+  product: "fluorite powder"
+  price: 4.12
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice098
+  product: "forge tongs"
+  price: 45
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice099
+  product: "frying pan"
+  price: 48.75
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice100
+  product: "fuel canister"
+  price: 142.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice101
+  product: "galvanized steel sheet"
+  price: 33.75
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice102
+  product: "Glass"
+  price: 15
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice103
+  product: "Glass Reinforced"
+  price: 30
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice104
+  product: "Gold"
+  price: 3.38
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice105
+  product: "gold ingot"
+  price: 41.25
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice106
+  product: "gold ore"
+  price: 25
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice107
+  product: "gold powder"
+  price: 10.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice108
+  product: "gold sheet"
   price: 45
 
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice109
-  product: "emerald crystal"
-  price: 120
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice110
-  product: "emerald lens"
-  price: 25
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice111
-  product: "emerald powder"
-  price: 30
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice112
-  product: "empty mold"
-  price: 2
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice113
-  product: "extractor"
-  price: 510
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice114
-  product: "extruder"
-  price: 600
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice115
-  product: "fast conveyor belt"
-  price: 440
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice116
-  product: "fasteners kit"
-  price: 5
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice117
-  product: "fertilizer mixer"
-  price: 480
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice118
-  product: "fine gold wire"
-  price: 30
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice119
-  product: "fine silver wire"
-  price: 20
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice120
-  product: "flint striker"
+  product: "Green Salad"
   price: 15
 
 - type: cmuIndustryPrice
+  id: RUMCIndustryPrice110
+  product: "Green Salad Meat"
+  price: 22.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice111
+  product: "Gunpowder"
+  price: 11.25
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice112
+  product: "Ham In Cheese"
+  price: 48.75
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice113
+  product: "Hammer"
+  price: 30
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice114
+  product: "heating kit"
+  price: 63.75
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice115
+  product: "high voltage cable shaft"
+  price: 82.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice116
+  product: "hydraulics kit"
+  price: 90
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice117
+  product: "Inedible Meal"
+  price: 1.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice118
+  product: "Inedible Pie"
+  price: 1.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice119
+  product: "Inedible Soup"
+  price: 1.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice120
+  product: "ingot mold"
+  price: 120
+
+- type: cmuIndustryPrice
   id: RUMCIndustryPrice121
-  product: "fluid barrel"
-  price: 200
+  product: "ingot mold for three"
+  price: 6.38
 
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice122
-  product: "fluid solidifier"
-  price: 480
+  product: "iron bowl"
+  price: 22.5
 
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice123
-  product: "fluorite crystal"
+  product: "iron ingot"
   price: 15
 
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice124
-  product: "fluorite powder"
-  price: 5.5
+  product: "iron ore"
+  price: 7.5
 
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice125
-  product: "forge tongs"
-  price: 60
+  product: "iron plate"
+  price: 22.5
 
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice126
-  product: "frying pan"
-  price: 65
+  product: "iron powder"
+  price: 4.12
 
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice127
-  product: "fuel blender"
-  price: 690
+  product: "Jackhammer"
+  price: 532.5
 
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice128
-  product: "fuel canister"
-  price: 190
+  product: "kitchen stove with an oven"
+  price: 337.5
 
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice129
-  product: "galvanic bath"
-  price: 480
+  product: "laxanite crystal"
+  price: 10
 
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice130
-  product: "galvanized steel sheet"
-  price: 45
+  product: "laxanite powder"
+  price: 4.88
 
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice131
-  product: "gas turbine"
-  price: 760
+  product: "laytoite crystal"
+  price: 10
 
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice132
-  product: "Glass"
-  price: 20
+  product: "laytoite powder"
+  price: 4.88
 
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice133
-  product: "Glass Reinforced"
-  price: 40
+  product: "lead ingot"
+  price: 22.5
 
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice134
-  product: "Gold"
-  price: 4.5
+  product: "lead ore"
+  price: 12.5
 
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice135
-  product: "gold ingot"
-  price: 55
+  product: "lead powder"
+  price: 5.62
 
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice136
-  product: "gold ore"
-  price: 50
+  product: "lead sheet"
+  price: 26.25
 
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice137
-  product: "gold powder"
-  price: 14
+  product: "leather"
+  price: 3.38
 
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice138
-  product: "gold sheet"
-  price: 60
+  product: "Light Bulb"
+  price: 30
 
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice139
-  product: "Green Salad"
-  price: 20
+  product: "Light Tube"
+  price: 41.25
 
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice140
-  product: "Green Salad Meat"
-  price: 30
+  product: "logic chips kit"
+  price: 6.75
 
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice141
-  product: "grinder"
-  price: 450
+  product: "low voltage cable shaft"
+  price: 33.75
 
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice142
-  product: "Gunpowder"
-  price: 15
+  product: "low-power chips kit"
+  price: 6.75
 
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice143
-  product: "Ham In Cheese"
-  price: 65
+  product: "magnetic rod"
+  price: 15
 
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice144
-  product: "Hammer"
-  price: 40
+  product: "Mashed Potato"
+  price: 15
 
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice145
-  product: "heating kit"
-  price: 85
+  product: "Mashed Potato Meat"
+  price: 22.5
 
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice146
-  product: "high voltage cable shaft"
-  price: 110
+  product: "Mashed Potato Salad"
+  price: 26.25
 
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice147
-  product: "hydraulics kit"
-  price: 120
+  product: "Material Cloth1"
+  price: 15
 
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice148
-  product: "Inedible Meal"
-  price: 2
+  product: "Meat Cheese Soup"
+  price: 30
 
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice149
-  product: "Inedible Pie"
-  price: 2
+  product: "Meat Plate"
+  price: 11.25
 
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice150
-  product: "Inedible Soup"
-  price: 2
+  product: "Meat Salad Soup"
+  price: 30
 
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice151
-  product: "ingot mold"
-  price: 160
+  product: "Meat Soup"
+  price: 18.75
 
 - type: cmuIndustryPrice
   id: RUMCIndustryPrice152
-  product: "ingot mold for three"
-  price: 8.5
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice153
-  product: "iron bowl"
-  price: 30
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice154
-  product: "iron ingot"
-  price: 20
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice155
-  product: "iron ore"
-  price: 15
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice156
-  product: "iron plate"
-  price: 30
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice157
-  product: "iron powder"
-  price: 5.5
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice158
-  product: "Jackhammer"
-  price: 710
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice159
-  product: "kitchen stove with an oven"
-  price: 450
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice160
-  product: "laser engraver"
-  price: 580
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice161
-  product: "lathe"
-  price: 480
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice162
-  product: "laxanite crystal"
-  price: 20
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice163
-  product: "laxanite powder"
-  price: 6.5
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice164
-  product: "laytoite crystal"
-  price: 20
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice165
-  product: "laytoite powder"
-  price: 6.5
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice166
-  product: "lead ingot"
-  price: 30
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice167
-  product: "lead ore"
-  price: 25
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice168
-  product: "lead powder"
-  price: 7.5
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice169
-  product: "lead sheet"
-  price: 35
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice170
-  product: "leather"
-  price: 4.5
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice171
-  product: "Light Bulb"
-  price: 40
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice172
-  product: "Light Tube"
-  price: 55
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice173
-  product: "logic chips kit"
-  price: 9
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice174
-  product: "low voltage cable shaft"
-  price: 45
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice175
-  product: "low-power chips kit"
-  price: 9
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice176
-  product: "machine casing parts"
-  price: 160
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice177
-  product: "magnetic rod"
-  price: 20
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice178
-  product: "Mashed Potato"
-  price: 20
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice179
-  product: "Mashed Potato Meat"
-  price: 30
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice180
-  product: "Mashed Potato Salad"
-  price: 35
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice181
-  product: "Material Cloth1"
-  price: 20
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice182
-  product: "Meat Cheese Soup"
-  price: 40
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice183
-  product: "Meat Plate"
-  price: 15
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice184
-  product: "Meat Salad Soup"
-  price: 40
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice185
-  product: "Meat Soup"
-  price: 25
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice186
   product: "medium voltage cable shaft"
-  price: 80
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice187
-  product: "memory chips kit"
-  price: 9
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice188
-  product: "mixer"
-  price: 480
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice189
-  product: "Monster Brew"
-  price: 45
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice190
-  product: "Monster Egg"
-  price: 35
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice191
-  product: "oil barrel"
-  price: 280
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice192
-  product: "oil tank"
-  price: 550
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice193
-  product: "Oxygen"
-  price: 1
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice194
-  product: "Paper"
-  price: 15
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice195
-  product: "phosphorus crystal"
-  price: 15
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice196
-  product: "phosphorus powder"
-  price: 5.5
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice197
-  product: "pickaxe"
-  price: 120
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice198
-  product: "Pie Meat"
-  price: 15
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice199
-  product: "pie plate"
-  price: 55
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice200
-  product: "Pie Pumpkin"
-  price: 20
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice201
-  product: "Pie Veg"
-  price: 20
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice202
-  product: "plank bed"
-  price: 25
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice203
-  product: "plant fiber"
-  price: 2
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice204
-  product: "Plasteel"
-  price: 45
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice205
-  product: "plasteel ingot"
-  price: 30
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice206
-  product: "plasteel sheet"
-  price: 35
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice207
-  product: "Plastic"
-  price: 650
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice208
-  product: "plastic pellets"
-  price: 160
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice209
-  product: "plastitan ingot"
-  price: 40
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice210
-  product: "plastitan sheet"
-  price: 45
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice211
-  product: "platinum ingot"
-  price: 30
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice212
-  product: "platinum ore"
-  price: 40
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice213
-  product: "platinum powder"
-  price: 7.5
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice214
-  product: "platinum sheet"
-  price: 35
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice215
-  product: "polarizer"
-  price: 360
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice216
-  product: "polymerizer"
-  price: 800
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice217
-  product: "Power Cell High"
-  price: 440
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice218
-  product: "Power Cell Hyper"
-  price: 590
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice219
-  product: "Power Cell Medium"
-  price: 270
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice220
-  product: "Power Cell Small"
-  price: 170
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice221
-  product: "Power Drill"
-  price: 360
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice222
-  product: "processor chips kit"
-  price: 9
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice223
-  product: "Prospector"
-  price: 290
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice224
-  product: "Pumpkin Puree"
-  price: 30
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice225
-  product: "pyrolysis oven"
-  price: 560
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice226
-  product: "quality boards kit"
-  price: 210
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice227
-  product: "quality structure parts kit"
-  price: 240
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice228
-  product: "quartz crystal"
-  price: 10
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice229
-  product: "quartz powder"
-  price: 4.5
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice230
-  product: "rake"
-  price: 50
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice231
-  product: "raw rubber"
-  price: 160
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice232
-  product: "reagent-name-au14-crude-oil"
-  price: 8
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice233
-  product: "reagent-name-au14-diesel"
-  price: 15
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice234
-  product: "reagent-name-au14-heavy-fuel"
-  price: 10
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice235
-  product: "reagent-name-au14-light-fuel"
-  price: 10
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice236
-  product: "reagent-name-au14-naphtha"
-  price: 10
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice237
-  product: "recycler"
-  price: 570
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice238
-  product: "reinforced concrete bag"
-  price: 45
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice239
-  product: "Rod Metal"
-  price: 15
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice240
-  product: "rough diamond crystal"
-  price: 120
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice241
-  product: "rubber sheet"
-  price: 85
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice242
-  product: "ruby"
-  price: 45
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice243
-  product: "ruby crystal"
-  price: 120
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice244
-  product: "ruby lens"
-  price: 25
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice245
-  product: "ruby powder"
-  price: 30
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice246
-  product: "saltpeter crystal"
-  price: 25
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice247
-  product: "saltpeter powder"
-  price: 7.5
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice248
-  product: "sand"
-  price: 25
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice249
-  product: "sharpened stake"
-  price: 5
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice250
-  product: "Sheet Cardboard"
-  price: 5.5
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice251
-  product: "Sheet Cardboard1"
-  price: 15
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice252
-  product: "Sheet Metal1"
-  price: 2
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice253
-  product: "sheet mold"
-  price: 8.5
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice254
-  product: "sifter"
-  price: 450
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice255
-  product: "silicon ingot"
-  price: 35
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice256
-  product: "silicon wafer"
-  price: 10
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice257
-  product: "silver ingot"
-  price: 30
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice258
-  product: "silver ore"
-  price: 45
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice259
-  product: "silver powder"
-  price: 7.5
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice260
-  product: "silver sheet"
-  price: 35
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice261
-  product: "silver solar panel"
-  price: 420
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice262
-  product: "simple circuits set"
-  price: 75
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice263
-  product: "slag"
-  price: 3
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice264
-  product: "smithing hammer"
-  price: 85
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice265
-  product: "solar panel"
-  price: 220
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice266
-  product: "solid-fuel press"
-  price: 330
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice267
-  product: "steam cracker"
-  price: 860
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice268
-  product: "steam drill"
-  price: 300
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice269
-  product: "steam extractor"
-  price: 330
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice270
-  product: "steam grinder"
-  price: 300
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice271
-  product: "steam press"
-  price: 300
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice272
-  product: "steam smelter"
-  price: 300
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice273
-  product: "Steel"
-  price: 25
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice274
-  product: "steel pipe"
-  price: 55
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice275
-  product: "steel pipe going down"
-  price: 80
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice276
-  product: "steel rod"
-  price: 15
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice277
-  product: "Stock Part Capacitor"
-  price: 140
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice278
-  product: "Stock Part Manipulator Micro"
-  price: 140
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice279
-  product: "Stock Part Matter Bin"
-  price: 200
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice280
-  product: "Stock Part Micro Laser"
-  price: 85
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice281
-  product: "Stock Part Scanning Module"
-  price: 80
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice282
-  product: "stone axe"
-  price: 25
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice283
-  product: "stone chisel"
-  price: 25
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice284
-  product: "stone fragment"
-  price: 5
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice285
-  product: "stone hammer"
-  price: 45
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice286
-  product: "stone pickaxe"
-  price: 35
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice287
-  product: "stone powder"
-  price: 4.5
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice288
-  product: "stone shovel"
-  price: 30
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice289
-  product: "stone smeltery"
-  price: 160
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice290
-  product: "stone tongs"
-  price: 35
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice291
-  product: "Stuffed Potato"
-  price: 50
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice292
-  product: "sulfur powder"
-  price: 20
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice293
-  product: "tannery"
-  price: 600
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice294
-  product: "thin HV cable coil"
-  price: 470
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice295
-  product: "thin LV cable coil"
-  price: 85
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice296
-  product: "thin MV cable coil"
-  price: 260
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice297
-  product: "Tile Steel"
-  price: 7.5
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice298
-  product: "tin can"
-  price: 15
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice299
-  product: "titanium ingot"
-  price: 35
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice300
-  product: "titanium ore"
-  price: 35
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice301
-  product: "titanium powder"
-  price: 7.5
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice302
-  product: "titanium sheet"
-  price: 40
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice303
-  product: "trimorid crystal"
-  price: 25
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice304
-  product: "trimorid powder"
-  price: 7.5
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice305
-  product: "tungsten ingot"
-  price: 35
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice306
-  product: "tungsten ore"
-  price: 50
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice307
-  product: "tungsten powder"
-  price: 7.5
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice308
-  product: "tungsten sheet"
-  price: 40
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice309
-  product: "Uantiseptic"
-  price: 20
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice310
-  product: "Uantiseptic Gauze"
-  price: 7
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice311
-  product: "Uantiseptic Trauma Dressing"
-  price: 20
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice312
-  product: "Uburn Gel"
-  price: 20
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice313
-  product: "Uburn Gel Gauze"
-  price: 7
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice314
-  product: "Uburn Trauma Dressing"
-  price: 20
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice315
-  product: "Ucoagulant Powder"
-  price: 2.5
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice316
-  product: "Ucompression Gauze"
-  price: 9.5
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice317
-  product: "Ucompression Trauma Dressing"
-  price: 25
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice318
-  product: "Uhemostatic Gauze"
-  price: 4
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice319
-  product: "Uhemostatic Trauma Dressing"
-  price: 15
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice320
-  product: "Uplain Gauze"
-  price: 2.5
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice321
-  product: "Uplain Trauma Dressing"
-  price: 10
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice322
-  product: "uranium ore"
   price: 60
 
 - type: cmuIndustryPrice
-  id: RUMCIndustryPrice323
+  id: RUMCIndustryPrice153
+  product: "memory chips kit"
+  price: 6.75
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice154
+  product: "Monster Brew"
+  price: 33.75
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice155
+  product: "Monster Egg"
+  price: 26.25
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice156
+  product: "oil barrel"
+  price: 210
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice157
+  product: "oil tank"
+  price: 412.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice158
+  product: "Paper"
+  price: 11.25
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice159
+  product: "phosphorus crystal"
+  price: 7.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice160
+  product: "phosphorus powder"
+  price: 4.12
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice161
+  product: "pickaxe"
+  price: 90
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice162
+  product: "Pie Meat"
+  price: 11.25
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice163
+  product: "pie plate"
+  price: 41.25
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice164
+  product: "Pie Pumpkin"
+  price: 15
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice165
+  product: "Pie Veg"
+  price: 15
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice166
+  product: "plank bed"
+  price: 18.75
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice167
+  product: "plant fiber"
+  price: 1.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice168
+  product: "Plasteel"
+  price: 33.75
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice169
+  product: "plasteel ingot"
+  price: 22.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice170
+  product: "plasteel sheet"
+  price: 26.25
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice171
+  product: "Plastic"
+  price: 487.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice172
+  product: "plastic pellets"
+  price: 120
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice173
+  product: "plastitan ingot"
+  price: 30
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice174
+  product: "plastitan sheet"
+  price: 33.75
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice175
+  product: "platinum ingot"
+  price: 22.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice176
+  product: "platinum ore"
+  price: 20
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice177
+  product: "platinum powder"
+  price: 5.62
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice178
+  product: "platinum sheet"
+  price: 26.25
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice179
+  product: "Power Cell High"
+  price: 330
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice180
+  product: "Power Cell Hyper"
+  price: 442.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice181
+  product: "Power Cell Medium"
+  price: 202.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice182
+  product: "Power Cell Small"
+  price: 127.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice183
+  product: "Power Drill"
+  price: 270
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice184
+  product: "processor chips kit"
+  price: 6.75
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice185
+  product: "Prospector"
+  price: 217.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice186
+  product: "Pumpkin Puree"
+  price: 22.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice187
+  product: "quality boards kit"
+  price: 157.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice188
+  product: "quality structure parts kit"
+  price: 180
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice189
+  product: "quartz crystal"
+  price: 5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice190
+  product: "quartz powder"
+  price: 3.38
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice191
+  product: "rake"
+  price: 37.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice192
+  product: "raw rubber"
+  price: 120
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice193
+  product: "reagent-name-au14-crude-oil"
+  price: 0.075
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice194
+  product: "reagent-name-au14-diesel"
+  price: 0.75
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice195
+  product: "reagent-name-au14-heavy-fuel"
+  price: 0.1875
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice196
+  product: "reagent-name-au14-light-fuel"
+  price: 0.375
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice197
+  product: "reagent-name-au14-naphtha"
+  price: 0.375
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice198
+  product: "reinforced concrete bag"
+  price: 33.75
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice199
+  product: "Rod Metal"
+  price: 11.25
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice200
+  product: "rough diamond crystal"
+  price: 60
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice201
+  product: "rubber sheet"
+  price: 63.75
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice202
+  product: "ruby"
+  price: 90
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice203
+  product: "ruby crystal"
+  price: 60
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice204
+  product: "ruby lens"
+  price: 18.75
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice205
+  product: "ruby powder"
+  price: 22.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice206
+  product: "saltpeter crystal"
+  price: 12.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice207
+  product: "saltpeter powder"
+  price: 5.62
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice208
+  product: "sand"
+  price: 18.75
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice209
+  product: "sharpened stake"
+  price: 3.75
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice210
+  product: "Sheet Cardboard"
+  price: 4.12
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice211
+  product: "Sheet Cardboard1"
+  price: 11.25
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice212
+  product: "Sheet Metal1"
+  price: 1.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice213
+  product: "sheet mold"
+  price: 6.38
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice214
+  product: "silicon ingot"
+  price: 26.25
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice215
+  product: "silicon wafer"
+  price: 7.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice216
+  product: "silver ingot"
+  price: 22.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice217
+  product: "silver ore"
+  price: 22.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice218
+  product: "silver powder"
+  price: 5.62
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice219
+  product: "silver sheet"
+  price: 26.25
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice220
+  product: "simple circuits set"
+  price: 56.25
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice221
+  product: "slag"
+  price: 2.25
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice222
+  product: "smithing hammer"
+  price: 63.75
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice223
+  product: "Steel"
+  price: 18.75
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice224
+  product: "steel pipe"
+  price: 41.25
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice225
+  product: "steel pipe going down"
+  price: 60
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice226
+  product: "steel rod"
+  price: 11.25
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice227
+  product: "Stock Part Capacitor"
+  price: 105
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice228
+  product: "Stock Part Manipulator Micro"
+  price: 105
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice229
+  product: "Stock Part Matter Bin"
+  price: 150
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice230
+  product: "Stock Part Micro Laser"
+  price: 63.75
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice231
+  product: "Stock Part Scanning Module"
+  price: 60
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice232
+  product: "stone axe"
+  price: 18.75
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice233
+  product: "stone chisel"
+  price: 18.75
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice234
+  product: "stone fragment"
+  price: 3.75
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice235
+  product: "stone hammer"
+  price: 33.75
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice236
+  product: "stone pickaxe"
+  price: 26.25
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice237
+  product: "stone powder"
+  price: 3.38
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice238
+  product: "stone shovel"
+  price: 22.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice239
+  product: "stone tongs"
+  price: 26.25
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice240
+  product: "Stuffed Potato"
+  price: 37.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice241
+  product: "sulfur powder"
+  price: 15
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice242
+  product: "thin HV cable coil"
+  price: 352.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice243
+  product: "thin LV cable coil"
+  price: 63.75
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice244
+  product: "thin MV cable coil"
+  price: 195
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice245
+  product: "Tile Steel"
+  price: 5.62
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice246
+  product: "tin can"
+  price: 11.25
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice247
+  product: "titanium ingot"
+  price: 26.25
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice248
+  product: "titanium ore"
+  price: 17.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice249
+  product: "titanium powder"
+  price: 5.62
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice250
+  product: "titanium sheet"
+  price: 30
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice251
+  product: "trimorid crystal"
+  price: 12.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice252
+  product: "trimorid powder"
+  price: 5.62
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice253
+  product: "tungsten ingot"
+  price: 26.25
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice254
+  product: "tungsten ore"
+  price: 25
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice255
+  product: "tungsten powder"
+  price: 5.62
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice256
+  product: "tungsten sheet"
+  price: 30
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice257
+  product: "Uantiseptic"
+  price: 15
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice258
+  product: "Uantiseptic Gauze"
+  price: 5.25
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice259
+  product: "Uantiseptic Trauma Dressing"
+  price: 15
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice260
+  product: "Uburn Gel"
+  price: 15
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice261
+  product: "Uburn Gel Gauze"
+  price: 5.25
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice262
+  product: "Uburn Trauma Dressing"
+  price: 15
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice263
+  product: "Ucoagulant Powder"
+  price: 1.88
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice264
+  product: "Ucompression Gauze"
+  price: 7.12
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice265
+  product: "Ucompression Trauma Dressing"
+  price: 18.75
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice266
+  product: "Uhemostatic Gauze"
+  price: 3
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice267
+  product: "Uhemostatic Trauma Dressing"
+  price: 11.25
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice268
+  product: "Uplain Gauze"
+  price: 1.88
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice269
+  product: "Uplain Trauma Dressing"
+  price: 7.5
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice270
+  product: "uranium ore"
+  price: 30
+
+- type: cmuIndustryPrice
+  id: RUMCIndustryPrice271
   product: "uranium powder"
-  price: 7.5
+  price: 5.62
 
 - type: cmuIndustryPrice
-  id: RUMCIndustryPrice324
+  id: RUMCIndustryPrice272
   product: "Usealing Gauze"
-  price: 15
+  price: 11.25
 
 - type: cmuIndustryPrice
-  id: RUMCIndustryPrice325
+  id: RUMCIndustryPrice273
   product: "Usealing Trauma Dressing"
-  price: 25
+  price: 18.75
 
 - type: cmuIndustryPrice
-  id: RUMCIndustryPrice326
+  id: RUMCIndustryPrice274
   product: "Uthin Cable Lv"
-  price: 8.5
+  price: 6.38
 
 - type: cmuIndustryPrice
-  id: RUMCIndustryPrice327
+  id: RUMCIndustryPrice275
   product: "Utissue Sealant"
-  price: 50
+  price: 37.5
 
 - type: cmuIndustryPrice
-  id: RUMCIndustryPrice328
+  id: RUMCIndustryPrice276
   product: "Utrauma Foam"
-  price: 35
+  price: 26.25
 
 - type: cmuIndustryPrice
-  id: RUMCIndustryPrice329
+  id: RUMCIndustryPrice277
   product: "Veg Soup"
-  price: 40
+  price: 30
 
 - type: cmuIndustryPrice
-  id: RUMCIndustryPrice330
-  product: "Water"
-  price: 0.5
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice331
+  id: RUMCIndustryPrice278
   product: "weapon steel sheet"
-  price: 45
+  price: 33.75
 
 - type: cmuIndustryPrice
-  id: RUMCIndustryPrice332
+  id: RUMCIndustryPrice279
   product: "weapon-grade steel ingot"
-  price: 40
+  price: 30
 
 - type: cmuIndustryPrice
-  id: RUMCIndustryPrice333
-  product: "wiremill"
-  price: 450
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice334
+  id: RUMCIndustryPrice280
   product: "wiring kit"
-  price: 15
+  price: 11.25
 
 - type: cmuIndustryPrice
-  id: RUMCIndustryPrice335
+  id: RUMCIndustryPrice281
   product: "Wood"
-  price: 5
+  price: 3.75
 
 - type: cmuIndustryPrice
-  id: RUMCIndustryPrice336
+  id: RUMCIndustryPrice282
   product: "wood kitchen stove"
-  price: 300
+  price: 225
 
 - type: cmuIndustryPrice
-  id: RUMCIndustryPrice337
+  id: RUMCIndustryPrice283
   product: "wooden axe"
-  price: 15
+  price: 11.25
 
 - type: cmuIndustryPrice
-  id: RUMCIndustryPrice338
+  id: RUMCIndustryPrice284
   product: "wooden bowl"
-  price: 8.5
+  price: 6.38
 
 - type: cmuIndustryPrice
-  id: RUMCIndustryPrice339
+  id: RUMCIndustryPrice285
   product: "wooden pickaxe"
-  price: 20
+  price: 15
 
 - type: cmuIndustryPrice
-  id: RUMCIndustryPrice340
+  id: RUMCIndustryPrice286
   product: "wooden planter"
-  price: 35
+  price: 26.25
 
 - type: cmuIndustryPrice
-  id: RUMCIndustryPrice341
+  id: RUMCIndustryPrice287
   product: "wooden plate"
-  price: 8.5
+  price: 6.38
 
 - type: cmuIndustryPrice
-  id: RUMCIndustryPrice342
+  id: RUMCIndustryPrice288
   product: "wooden shovel"
-  price: 15
+  price: 11.25
 
 - type: cmuIndustryPrice
-  id: RUMCIndustryPrice343
+  id: RUMCIndustryPrice289
   product: "wooden tub"
-  price: 30
+  price: 22.5
 
 - type: cmuIndustryPrice
-  id: RUMCIndustryPrice344
+  id: RUMCIndustryPrice290
   product: "Wrench"
-  price: 4
+  price: 3
 
 - type: cmuIndustryPrice
-  id: RUMCIndustryPrice345
+  id: RUMCIndustryPrice291
   product: "Zellasian Breakfast"
-  price: 45
+  price: 33.75
 
 - type: cmuIndustryPrice
-  id: RUMCIndustryPrice346
+  id: RUMCIndustryPrice292
   product: "zinc ingot"
-  price: 30
+  price: 22.5
 
 - type: cmuIndustryPrice
-  id: RUMCIndustryPrice347
+  id: RUMCIndustryPrice293
   product: "zinc ore"
-  price: 25
+  price: 12.5
 
 - type: cmuIndustryPrice
-  id: RUMCIndustryPrice348
+  id: RUMCIndustryPrice294
   product: "zinc powder"
-  price: 7.5
+  price: 5.62
 
 - type: cmuIndustryPrice
-  id: RUMCIndustryPrice349
+  id: RUMCIndustryPrice295
   product: "zinc sheet"
-  price: 35
-
-# MegaSeed servitor produce. These are per harvested unit: common field crops are
-# inexpensive, retail fruit and vegetables sit in the middle, and specialty,
-# medicinal, poisonous, or labor-intensive crops receive the highest values.
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice350
-  product: "aloe"
-  price: 12
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice351
-  product: "ambrosia vulgaris"
-  price: 17
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice352
-  product: "apple"
-  price: 7
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice353
-  product: "banana"
-  price: 5
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice354
-  product: "berries"
-  price: 12
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice355
-  product: "carrot"
-  price: 6
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice356
-  product: "cabbage"
-  price: 5
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice357
-  product: "chanterelle cluster"
-  price: 15
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice358
-  product: "cherry"
-  price: 11
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice359
-  product: "chili pepper"
-  price: 9
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice360
-  product: "cocoa pod"
-  price: 13
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice361
-  product: "ear of corn"
-  price: 5
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice362
-  product: "cotton boll"
-  price: 8
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice363
-  product: "eggplant"
-  price: 8
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice364
-  product: "galaxythistle"
-  price: 19
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice365
-  product: "garlic"
-  price: 11
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice366
-  product: "grapes"
-  price: 9
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice367
-  product: "lemon"
-  price: 7
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice368
-  product: "lime"
-  price: 8
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice369
-  product: "pineapple"
-  price: 11
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice370
-  product: "lingzhi"
-  price: 20
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice371
-  product: "oat bushel"
-  price: 4
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice372
-  product: "onion"
-  price: 5
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice373
-  product: "red onion"
-  price: 7
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice374
-  product: "orange"
-  price: 7
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice375
-  product: "pea pod"
-  price: 6
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice376
-  product: "poppy"
-  price: 15
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice377
-  product: "potato"
-  price: 5
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice378
-  product: "pumpkin"
-  price: 9
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice379
-  product: "rice bushel"
-  price: 5
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice380
-  product: "soybeans"
-  price: 5
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice381
-  product: "sugarcane"
-  price: 5
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice382
-  product: "tea leaves"
-  price: 10
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice383
-  product: "tomato"
-  price: 7
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice384
-  product: "tower-cap log"
-  price: 13
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice385
-  product: "wheat bushel"
-  price: 4
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice386
-  product: "watermelon"
-  price: 12
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice387
-  product: "tobacco leaves"
-  price: 16
-
-- type: cmuIndustryPrice
-  id: RUMCIndustryPrice388
-  product: "fly amanita"
-  price: 13
+  price: 26.25

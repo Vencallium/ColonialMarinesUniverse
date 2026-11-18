@@ -29,8 +29,14 @@ public sealed class CMUGuidePriceSheet : BoxContainer, IDocumentTag
 
     public bool TryParseTag(Dictionary<string, string> args, [NotNullWhen(true)] out Control? control)
     {
-        foreach (var price in _prototypes.EnumeratePrototypes<CMUIndustryPricePrototype>()
-                     .OrderBy(entry => entry.Product, StringComparer.CurrentCultureIgnoreCase))
+        var prices = _prototypes.EnumeratePrototypes<CMUIndustryPricePrototype>()
+            .Select(entry => new
+            {
+                Product = Loc.TryGetString(entry.Product, out var localized) ? localized : entry.Product,
+                entry.Price,
+            })
+            .OrderBy(entry => entry.Product, StringComparer.CurrentCultureIgnoreCase);
+        foreach (var price in prices)
         {
             AddChild(new CMUGuidePriceRow(price.Product, price.Price));
         }
@@ -48,7 +54,7 @@ internal sealed class CMUGuidePriceRow : PanelContainer, ISearchableControl
 
     public CMUGuidePriceRow(string product, double price)
     {
-        _searchText = $"{product} {price:0.##}";
+        _searchText = $"{product} {price:0.####}";
         HorizontalExpand = true;
         Margin = new Thickness(0, 1);
         PanelOverride = new StyleBoxFlat
@@ -75,7 +81,7 @@ internal sealed class CMUGuidePriceRow : PanelContainer, ISearchableControl
         });
         row.AddChild(new Label
         {
-            Text = Loc.GetString("cmu-industry-price-sheet-value", ("price", price.ToString("0.##"))),
+            Text = Loc.GetString("cmu-industry-price-sheet-value", ("price", price.ToString("0.####"))),
             HorizontalAlignment = HAlignment.Right,
             FontColorOverride = Color.FromHex("#65d6a6"),
         });

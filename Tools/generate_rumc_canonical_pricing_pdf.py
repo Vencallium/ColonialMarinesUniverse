@@ -33,7 +33,38 @@ ROOT = Path(__file__).resolve().parents[1]
 PDF_PATH = ROOT / "output" / "pdf" / "RUMC_industry_catalog_and_pricing.pdf"
 SOURCE_PDF_PATH = ROOT / "tmp" / "pdfs" / "RUMC_industry_catalog_route_source.pdf"
 SOURCE_REVISION = "605bbf60ba"
+BASELINE_PRICE_REVISION = "f748e1d4f4"
 PRICES_PATH = ROOT / "Content.CMU" / "Resources" / "Prototypes" / "CMU14" / "Economy" / "asrs_industry_prices.yml"
+PROTOTYPES_PATH = ROOT / "Content.CMU" / "Resources" / "Prototypes" / "CMU14"
+
+# 2026-11-18 economy pass. Raw ores and crystals take the larger reduction;
+# every processed or otherwise catalogued product takes the general reduction.
+RAW_RESOURCE_MULTIPLIER = 0.50
+GENERAL_PRODUCT_MULTIPLIER = 0.75
+REFINED_GEMS = {
+    "alexandrite": "alexandrite crystal",
+    "diamond": "rough diamond crystal",
+    "emerald": "emerald crystal",
+    "ruby": "ruby crystal",
+}
+
+# These are the actual per-fluid-unit values consumed by PricingSystem.  Keep
+# the generated registry/PDF in lockstep with the reagent prototypes so the
+# guide, appraisal tool, tank examine text, and ASRS payout cannot disagree.
+PREVIOUS_SELLABLE_FLUID_PRICES = {
+    "reagent-name-au14-crude-oil": 0.10,
+    "reagent-name-au14-naphtha": 0.50,
+    "reagent-name-au14-light-fuel": 0.50,
+    "reagent-name-au14-heavy-fuel": 0.25,
+    "reagent-name-au14-diesel": 1.00,
+}
+SELLABLE_FLUID_DISPLAY_NAMES = {
+    "reagent-name-au14-crude-oil": "crude oil",
+    "reagent-name-au14-naphtha": "naphtha",
+    "reagent-name-au14-light-fuel": "light fuel",
+    "reagent-name-au14-heavy-fuel": "heavy fuel",
+    "reagent-name-au14-diesel": "diesel",
+}
 
 CATEGORY_NAMES = (
     "Components and power",
@@ -74,8 +105,27 @@ def clean(value: str | None) -> str:
     return re.sub(r"\s+", " ", value or "").strip()
 
 
+def capital_machine_names() -> set[str]:
+    """Read capital machinery names from the renamed RUMCMachine prototype family."""
+    names: set[str] = set()
+    for path in PROTOTYPES_PATH.rglob("*.yml"):
+        text = path.read_text(encoding="utf-8")
+        for block in re.split(r"(?=^- type: )", text, flags=re.MULTILINE):
+            id_match = re.search(r"^  id:\s*(RUMCMachine\S+)\s*$", block, flags=re.MULTILINE)
+            if not id_match:
+                continue
+            name_match = re.search(r"^  name:\s*[\"']?([^\n\"']+)[\"']?\s*$", block, flags=re.MULTILINE)
+            if name_match:
+                names.add(key(name_match.group(1)))
+    return names
+
+
 def key(value: str) -> str:
     return clean(value).casefold()
+
+
+def product_display_name(value: str) -> str:
+    return SELLABLE_FLUID_DISPLAY_NAMES.get(key(value), value)
 
 
 def number(value: str | None) -> float:
@@ -155,6 +205,27 @@ def restore_route_source() -> Path:
             check=True,
         )
     return SOURCE_PDF_PATH
+
+
+def load_previous_price_registry() -> dict[str, float]:
+    """Load the last committed live prices as the immutable balance baseline."""
+    source_object = f"{BASELINE_PRICE_REVISION}:{PRICES_PATH.relative_to(ROOT).as_posix()}"
+    result = subprocess.run(
+        ["git", "show", source_object],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+    )
+    return {
+        key(match.group(1)): float(match.group(2))
+        for match in re.finditer(
+            r'^  product:\s*"([^"]+)"\s*\n  price:\s*([0-9.]+)\s*$',
+            result.stdout,
+            flags=re.MULTILINE,
+        )
+    }
 
 
 def round_price(value: float) -> float:
@@ -276,7 +347,7 @@ def estimate_external_bases(routes: list[Route]) -> tuple[dict[str, float], dict
         "ruby crystal": 120,
         "saltpeter crystal": 25,
         "trimorid crystal": 25,
-        "reagent-name-au14-crude-oil": 8,
+        "reagent-name-au14-crude-oil": PREVIOUS_SELLABLE_FLUID_PRICES["reagent-name-au14-crude-oil"],
     }
     for raw_key, value in overrides.items():
         if raw_key in display_names:
@@ -358,14 +429,14 @@ def calculate_prices(
 def fmt(value: float) -> str:
     if abs(value - round(value)) < 1e-9:
         return f"{int(round(value)):,}"
-    return f"{value:,.2f}".rstrip("0").rstrip(".")
+    return f"{value:,.4f}".rstrip("0").rstrip(".")
 
 
 def yaml_number(value: float) -> str:
     """Format a machine-readable number without display thousands separators."""
     if abs(value - round(value)) < 1e-9:
         return str(int(round(value)))
-    return f"{value:.2f}".rstrip("0").rstrip(".")
+    return f"{value:.4f}".rstrip("0").rstrip(".")
 
 
 def primary_raw_key(name: str) -> bool:
@@ -375,8 +446,6 @@ def primary_raw_key(name: str) -> bool:
         or lowered.endswith("ore")
         or " crystal" in lowered
         or lowered in {
-            "water",
-            "oxygen",
             "branch",
             "plant fiber",
             "wood",
@@ -386,8 +455,57 @@ def primary_raw_key(name: str) -> bool:
             "stone fragment",
             "black stone fragment",
             "reagent-name-au14-crude-oil",
+            "crude oil",
         }
     )
+
+
+def reduced_raw_key(name: str) -> bool:
+    """Raw mined ores and crystals receive the 0.50 balance multiplier."""
+    lowered = name.casefold()
+    return lowered.endswith(" ore") or lowered.endswith(" crystal")
+
+
+def apply_balance_revision(
+    prices: dict[str, float],
+    external_bases: dict[str, float],
+    display_names: dict[str, str],
+) -> tuple[dict[str, float], dict[str, float], dict[str, str]]:
+    """Apply the requested balance multipliers without compounding route calculations.
+
+    Refined gems inherit 75% of the former high-value rough crystal price. This moves
+    the valuable stage from the mined crystal to the sifter output while keeping the
+    requested 0.50 raw / 0.75 refined relationship explicit.
+    """
+    revised: dict[str, float] = {}
+    rules: dict[str, str] = {}
+    for product_key, value in prices.items():
+        name = display_names.get(product_key, product_key)
+        multiplier = RAW_RESOURCE_MULTIPLIER if reduced_raw_key(name) else GENERAL_PRODUCT_MULTIPLIER
+        revised[product_key] = round(value * multiplier, 2)
+        rules[product_key] = f"{multiplier:g}x {'raw ore/crystal' if multiplier == RAW_RESOURCE_MULTIPLIER else 'general product'}"
+
+    for refined_name, raw_name in REFINED_GEMS.items():
+        refined_key = key(refined_name)
+        raw_key = key(raw_name)
+        if refined_key not in revised or raw_key not in prices:
+            continue
+        revised[refined_key] = round(prices[raw_key] * GENERAL_PRODUCT_MULTIPLIER, 2)
+        rules[refined_key] = "0.75x former rough-crystal tier"
+
+    # Fluid reagent pricing supports four decimal places. Preserve the exact
+    # 75% values instead of rounding 0.1875/0.375/0.075 to cents.
+    for fluid_key, previous_price in PREVIOUS_SELLABLE_FLUID_PRICES.items():
+        if fluid_key not in revised:
+            continue
+        revised[fluid_key] = round(previous_price * GENERAL_PRODUCT_MULTIPLIER, 4)
+        rules[fluid_key] = "0.75x eligible fuel/oil"
+
+    revised_bases = {
+        raw_key: revised.get(raw_key, round(value * GENERAL_PRODUCT_MULTIPLIER, 2))
+        for raw_key, value in external_bases.items()
+    }
+    return revised, revised_bases, rules
 
 
 def build_pdf(
@@ -398,6 +516,9 @@ def build_pdf(
     display_names: dict[str, str],
     best_route: dict[str, Route],
     components: dict[str, tuple[float, float]],
+    baseline_prices: dict[str, float],
+    balance_rules: dict[str, str],
+    excluded_products: set[str],
 ) -> None:
     page_size = landscape(letter)
     width, height = page_size
@@ -411,16 +532,17 @@ def build_pdf(
         rightMargin=margin,
         topMargin=margin,
         bottomMargin=margin,
+        pageCompression=1,
         title="RUMC Canonical Industry Pricing",
         author="Colonial Marines Universe",
-        subject="One canonical additive price per RUMC product prototype",
+        subject="One canonical balanced price per eligible RUMC product prototype",
     )
 
     def footer(canvas, document):
         canvas.saveState()
         canvas.setFillColor(colors.HexColor("#53616A"))
         canvas.setFont("Helvetica", 6.5)
-        canvas.drawString(margin, 0.23 * inch, "RUMC canonical pricing - raw base plus processing value - 2026-11-15")
+        canvas.drawString(margin, 0.23 * inch, "RUMC canonical pricing - raw and processed balance pass - 2026-11-18")
         canvas.drawRightString(width - margin, 0.23 * inch, f"Page {document.page}")
         canvas.restoreState()
 
@@ -493,7 +615,7 @@ def build_pdf(
         Paragraph("One product prototype, one price", subtitle),
         Spacer(1, 0.18 * inch),
         Paragraph(
-            "Every directly gathered raw resource has a fixed base value. Washing, grinding, sifting, smelting, pressing, assembly, and every other transformation add processing value to the materials consumed. A product never receives a different sale value merely because it was made by a different route.",
+                "Every product keeps one prototype price regardless of its production route. This revision halves raw ore and crystal values, reduces processed and other products to 75% of their prior canonical values, and moves the high-value gemstone tier from rough crystals to sifted gems.",
             ParagraphStyle("Lead", parent=subtitle, fontSize=11, leading=16),
         ),
         Spacer(1, 0.28 * inch),
@@ -502,7 +624,23 @@ def build_pdf(
     summary_data = [
         [Paragraph("Pricing scope", header), Paragraph("Count", header), Paragraph("Result", header)],
         [Paragraph("Source production rows", cell), Paragraph("542", cell_right), Paragraph("Used as route data only", cell)],
-        [Paragraph("Unique priced products", cell), Paragraph(str(len(best_route)), cell_right), Paragraph("Exactly one canonical sale price per product", cell)],
+        [
+            Paragraph("Unique priced products", cell),
+            Paragraph(
+                str(
+                    len(
+                        {product_key for product_key in best_route if product_key not in excluded_products}
+                        | {
+                            raw_key
+                            for raw_key in external_bases
+                            if raw_key in display_names and primary_raw_key(display_names[raw_key])
+                        }
+                    )
+                ),
+                cell_right,
+            ),
+            Paragraph("Exactly one canonical sale price per eligible product", cell),
+        ],
         [Paragraph("Duplicate product listings", cell), Paragraph("0", cell_right), Paragraph("Alternative routes are consolidated", cell)],
         [Paragraph("Permitted fluids", cell), Paragraph("Fuels and oils", cell_right), Paragraph("Other reagents, water, acids, and gases remain inputs only", cell)],
     ]
@@ -512,29 +650,29 @@ def build_pdf(
 
     story.extend(
         [
-            Paragraph("Canonical additive pricing rules", heading),
+            Paragraph("Canonical pricing rules", heading),
             Paragraph(
-                "1. Raw base: each directly gathered material has one fixed base price B. Raw resources do not inherit a category margin.",
+                "1. Raw ore and crystal reduction: final price = former canonical price x 0.50.",
                 body,
             ),
             Paragraph(
-                "2. Processing increase: each recipe adds its normalized time and handling allowance F. F is always positive, so transforming material always increases its value.",
+                "2. Processed and other product reduction: final price = former canonical price x 0.75.",
                 body,
             ),
             Paragraph(
-                "3. Route value: C = sum(input quantity x canonical input price) + F. Inputs are valued using their own canonical prices, which carries all earlier processing value forward.",
+                "3. Refined gems: diamond, ruby, emerald, and alexandrite produced by the sifter inherit 75% of the former high-value rough-crystal tier. Their rough crystals receive the 50% raw reduction, so refinement is the valuable stage.",
                 body,
             ),
             Paragraph(
-                "4. One price per product: when several recipes make the same prototype, the canonical price uses the least-cost valid production route. This prevents a cheap route from creating an ASRS resale exploit while still valuing every transformation.",
+                "4. One price per product: every route making the same prototype resolves to the same final ASRS unit price.",
                 body,
             ),
             Paragraph(
-                "5. Co-products: recipe inputs and processing are normalized per output unit before valuation. Co-products do not duplicate the final catalog entry.",
+                "5. Co-products do not create duplicate catalog entries. Each tangible output is priced per unit; eligible fuel and oil liquids are priced per fluid unit.",
                 body,
             ),
             Paragraph(
-                "6. Rounding: values under 10 round upward to 0.5; values from 10 to 99.99 round upward to 5; values of 100 or more round upward to 10. Import value is 1.5 times the canonical price using the same rounding.",
+                "6. Balance multiplication is retained to two decimal places. Import value remains 1.5 times the final canonical price using the catalog's import rounding rule.",
                 body,
             ),
             Spacer(1, 0.08 * inch),
@@ -543,10 +681,10 @@ def build_pdf(
     )
     formula_data = [
         [Paragraph("Stage", header), Paragraph("Rule", header)],
-        [Paragraph("Raw resource", cell), Paragraph("P(raw) = B(raw)", cell)],
-        [Paragraph("Processed product by route r", cell), Paragraph("C(r, product) = sum(qi x P(input i)) + F(r)", cell)],
-        [Paragraph("Canonical product price", cell), Paragraph("P(product) = round up(minimum valid C(r, product))", cell)],
-        [Paragraph("Import price", cell), Paragraph("I(product) = round up(1.5 x P(product))", cell)],
+        [Paragraph("Raw ore or crystal", cell), Paragraph("P(new) = 0.50 x P(previous)", cell)],
+        [Paragraph("Processed / other product", cell), Paragraph("P(new) = 0.75 x P(previous)", cell)],
+        [Paragraph("Refined gemstone", cell), Paragraph("P(new) = 0.75 x P(previous rough crystal)", cell)],
+        [Paragraph("Import price", cell), Paragraph("I(product) = round up(1.5 x P(new))", cell)],
     ]
     formula_table = Table(formula_data, colWidths=[2.25 * inch, 5.25 * inch], repeatRows=1)
     formula_table.setStyle(table_style())
@@ -555,12 +693,12 @@ def build_pdf(
     story.append(Paragraph("Raw-material base prices", heading))
     story.append(
         Paragraph(
-            "These values anchor the entire production graph. They are sale values per raw unit before any industrial processing. Names are the prototype display names used by the production catalog.",
+            "These are the final sale values per directly gathered raw unit after the balance reduction. Names are the prototype display names used by the production catalog.",
             body,
         )
     )
     raw_rows = [
-        (display_names[raw_key], external_bases[raw_key])
+        (product_display_name(display_names[raw_key]), external_bases[raw_key])
         for raw_key in external_bases
         if raw_key in display_names and primary_raw_key(display_names[raw_key])
     ]
@@ -592,7 +730,7 @@ def build_pdf(
     story.append(Paragraph("Canonical product catalog", heading))
     story.append(
         Paragraph(
-            "Each product appears once. The reference route is the least-cost route used to establish its canonical price; other valid recipes still produce the same prototype at this same ASRS value.",
+            "Each product appears once. The baseline column records the prior canonical result, the balance rule shows the applied reduction, and every valid recipe for that prototype receives the same final ASRS value.",
             body,
         )
     )
@@ -603,8 +741,11 @@ def build_pdf(
 
     catalog_rows = []
     for output_key, route in best_route.items():
-        output_name = min((item.output for item in routes_by_output[output_key]), key=lambda value: (len(value), value.casefold()))
-        input_value, process_add = components[output_key]
+        if output_key in excluded_products:
+            continue
+        output_name = product_display_name(
+            min((item.output for item in routes_by_output[output_key]), key=lambda value: (len(value), value.casefold()))
+        )
         category_counts = Counter(item.category for item in routes_by_output[output_key])
         category = min(
             category_counts,
@@ -613,24 +754,24 @@ def build_pdf(
         sale = prices[output_key]
         import_price = round_price(sale * 1.5)
         reference = "Raw resource base" if output_key in external_bases else f"{route.machine}: {route.route}"
-        catalog_rows.append((category, output_name, input_value, process_add, sale, import_price, reference))
+        catalog_rows.append((category, output_name, baseline_prices[output_key], balance_rules[output_key], sale, import_price, reference))
 
     catalog_rows.sort(key=lambda item: (CATEGORY_PRIORITY.get(item[0], 999), item[1].casefold()))
     catalog_data = [[
         Paragraph("Category", header),
         Paragraph("Product prototype / unit", header),
-        Paragraph("Carried input value", header),
-        Paragraph("Processing increase", header),
+        Paragraph("Previous canonical", header),
+        Paragraph("Balance rule", header),
         Paragraph("Canonical ASRS price", header),
         Paragraph("Import price", header),
         Paragraph("Reference route", header),
     ]]
-    for category, output, input_value, process_add, sale, import_price, reference in catalog_rows:
+    for category, output, baseline, balance_rule, sale, import_price, reference in catalog_rows:
         catalog_data.append([
             Paragraph(category, cell),
             Paragraph(output, cell),
-            Paragraph(fmt(input_value), cell_right),
-            Paragraph("+" + fmt(process_add), cell_right),
+            Paragraph(fmt(baseline), cell_right),
+            Paragraph(balance_rule, cell),
             Paragraph(fmt(sale), cell_right),
             Paragraph(fmt(import_price), cell_right),
             Paragraph(reference, cell),
@@ -638,7 +779,7 @@ def build_pdf(
 
     catalog = Table(
         catalog_data,
-        colWidths=[1.05 * inch, 1.60 * inch, 0.82 * inch, 0.82 * inch, 0.92 * inch, 0.74 * inch, 3.65 * inch],
+        colWidths=[1.05 * inch, 1.60 * inch, 0.82 * inch, 1.20 * inch, 0.92 * inch, 0.74 * inch, 3.27 * inch],
         repeatRows=1,
         splitByRow=1,
     )
@@ -658,7 +799,7 @@ def build_pdf(
                 body,
             ),
             Paragraph(
-                "This document replaces route-specific producer margins with additive material and processing value. It is intended to be the canonical price schedule used when static prices are applied to RUMC output prototypes.",
+                "This document records the 2026-11-18 raw-versus-processed balance reduction. It is the canonical price schedule used by ASRS appraisal for RUMC output prototypes.",
                 body,
             ),
         ]
@@ -673,6 +814,7 @@ def write_price_prototypes(
     prices: dict[str, float],
     external_bases: dict[str, float],
     display_names: dict[str, str],
+    excluded_products: set[str],
 ) -> int:
     products: dict[str, tuple[str, float]] = {}
     routes_by_output: dict[str, list[Route]] = defaultdict(list)
@@ -680,6 +822,8 @@ def write_price_prototypes(
         routes_by_output[route.output_key].append(route)
 
     for output_key, output_routes in routes_by_output.items():
+        if output_key in excluded_products:
+            continue
         output_name = min((route.output for route in output_routes), key=lambda value: (len(value), value.casefold()))
         products[output_key] = (output_name, prices[output_key])
 
@@ -728,14 +872,28 @@ def table_style() -> TableStyle:
 def main() -> None:
     routes = extract_routes(restore_route_source())
     external_bases, display_names = estimate_external_bases(routes)
-    prices, best_route, components = calculate_prices(routes, external_bases)
+    baseline_prices, best_route, components = calculate_prices(routes, external_bases)
     if len(best_route) != 315:
         raise RuntimeError(f"Expected 315 unique products, calculated {len(best_route)}")
-    build_pdf(PDF_PATH, routes, prices, external_bases, display_names, best_route, components)
-    price_count = write_price_prototypes(PRICES_PATH, routes, prices, external_bases, display_names)
+    for product_key, previous_price in load_previous_price_registry().items():
+        if product_key in baseline_prices:
+            baseline_prices[product_key] = previous_price
+        if product_key in external_bases:
+            external_bases[product_key] = previous_price
+    for fluid_key, previous_price in PREVIOUS_SELLABLE_FLUID_PRICES.items():
+        if fluid_key in baseline_prices:
+            baseline_prices[fluid_key] = previous_price
+        if fluid_key in external_bases:
+            external_bases[fluid_key] = previous_price
+    prices, external_bases, balance_rules = apply_balance_revision(baseline_prices, external_bases, display_names)
+    excluded_products = capital_machine_names()
+    build_pdf(PDF_PATH, routes, prices, external_bases, display_names, best_route, components,
+        baseline_prices, balance_rules, excluded_products)
+    price_count = write_price_prototypes(PRICES_PATH, routes, prices, external_bases, display_names, excluded_products)
     print(f"Wrote {PDF_PATH}")
     print(f"Raw bases: {sum(primary_raw_key(display_names[k]) for k in external_bases if k in display_names)}")
     print(f"Canonical products: {len(best_route)}")
+    print(f"Capital machinery excluded: {sum(name in best_route for name in excluded_products)}")
     print(f"Runtime prices: {price_count}")
 
 

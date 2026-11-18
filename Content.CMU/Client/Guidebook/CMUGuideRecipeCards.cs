@@ -27,7 +27,9 @@ public sealed partial class CMUGuideRecipeCards : BoxContainer, IDocumentTag
     public bool TryParseTag(Dictionary<string, string> args, [NotNullWhen(true)] out Control? control)
     {
         var catalog = new CMUGuideRecipeCatalog(_entities, _prototypes);
-        var recipes = catalog.Entries.Where(entry => entry.StationGroup != null).ToList();
+        // The catalog also contains hand crafting, tool processing, casting and other
+        // production routes. Gathering entries have CanPlan disabled and remain sources.
+        var recipes = catalog.Entries.Where(entry => entry.CanPlan).ToList();
 
         var products = recipes
             .SelectMany(entry => entry.Outputs.Select(output => catalog.Canonical(output.Material)))
