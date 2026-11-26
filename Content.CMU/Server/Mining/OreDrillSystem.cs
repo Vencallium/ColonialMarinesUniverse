@@ -271,7 +271,6 @@ public sealed class OreDrillSystem : EntitySystem
                 continue;
             }
 
-            EnsureComp<Content.Shared.CMU14.ColonyEconomy.ASRSSellableComponent>(held);
             _stack.TryMergeStacks((made, madeStack), (held, heldStack), out _);
             if (TerminatingOrDeleted(made))
                 return;

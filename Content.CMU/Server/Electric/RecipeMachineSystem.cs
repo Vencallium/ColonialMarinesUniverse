@@ -418,7 +418,6 @@ public sealed class RecipeMachineSystem : EntitySystem
                     continue;
                 }
 
-                EnsureComp<ASRSSellableComponent>(held);
                 _stack.TryMergeStacks((result, resultStack), (held, heldStack), out _);
                 if (TerminatingOrDeleted(result) || resultStack.Count <= 0)
                     return;

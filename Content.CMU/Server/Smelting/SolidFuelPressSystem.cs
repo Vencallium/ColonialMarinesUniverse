@@ -308,7 +308,6 @@ public sealed class SolidFuelPressSystem : EntitySystem
             }
 
             _stack.TryMergeStacks(made, (held, heldStack), out _);
-            EnsureComp<Content.Shared.CMU14.ColonyEconomy.ASRSSellableComponent>(held);
             if (!TerminatingOrDeleted(made))
                 Del(made);
 

@@ -643,10 +643,10 @@ public sealed partial class RequisitionsSystem : SharedRequisitionsSystem
             // if (HasComp<CargoSellBlacklistComponent>(entity))
             //     continue;
             // CMU14: Accept loose invoices and industry exports as well as explicitly whitelisted cargo.
-            if (!HasComp<CargoSellWhitelistComponent>(entity) && !HasComp<RequisitionsInvoiceComponent>(entity)
+            if (!HasComp<RequisitionsInvoiceComponent>(entity)
+                && !HasComp<RequisitionsCrateComponent>(entity)
                 && !_industryExports.CanExport(entity))
             {
-                QueueDel(entity);
                 continue;
             }
 
@@ -657,10 +657,14 @@ public sealed partial class RequisitionsSystem : SharedRequisitionsSystem
                 {
                     // CMU14: Preserve the crate refund and pay for eligible industry contents.
                     // entRewards += crate.Reward;
-                    entRewards += crate.Reward + (int) Math.Round(_industryExports.GetContainedExportPrice(entity));
+                    entRewards += (_industryExports.CanExport(entity) ? crate.Reward : 0)
+                                  + (int) Math.Round(_industryExports.GetContainedExportPrice(entity));
                 }
                 else
-                    entRewards += (int)Math.Round(_pricing.GetPrice(entity));
+                    entRewards += _industryExports.CanExport(entity)
+                        ? (int)Math.Round(_pricing.GetPrice(entity, includeContents: false))
+                          + (int)Math.Round(_industryExports.GetContainedExportPrice(entity))
+                        : 0;
 
                 if (entRewards > 0)
                     soldAny = true;

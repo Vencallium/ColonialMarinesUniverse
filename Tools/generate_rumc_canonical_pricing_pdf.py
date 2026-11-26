@@ -37,15 +37,54 @@ BASELINE_PRICE_REVISION = "f748e1d4f4"
 PRICES_PATH = ROOT / "Content.CMU" / "Resources" / "Prototypes" / "CMU14" / "Economy" / "asrs_industry_prices.yml"
 PROTOTYPES_PATH = ROOT / "Content.CMU" / "Resources" / "Prototypes" / "CMU14"
 
-# 2026-11-18 economy pass. Raw ores and crystals take the larger reduction;
+# 2026-11-22 economy pass. Raw ores and crystals take the larger reduction;
 # every processed or otherwise catalogued product takes the general reduction.
 RAW_RESOURCE_MULTIPLIER = 0.50
 GENERAL_PRODUCT_MULTIPLIER = 0.75
+PROCESSING_MARGIN = 1.10
 REFINED_GEMS = {
     "alexandrite": "alexandrite crystal",
     "diamond": "rough diamond crystal",
     "emerald": "emerald crystal",
     "ruby": "ruby crystal",
+}
+
+# Names follow the canonical registry, including the historical chrome/chromium split.
+# Powder must be worth more per unit than its raw ore or crystal because the guide
+# and appraisal tool display unit prices. Complete batches are checked as well.
+# Ingots and sheets must then clear the full cost of the preceding stage.
+METAL_PROCESSING_CHAINS = {
+    "aluminum ore": ("aluminum powder", "aluminum ingot", "aluminum sheet"),
+    "chrome ore": ("chromium powder", "chromium ingot", "chrome sheet"),
+    "cobalt ore": ("cobalt powder", "cobalt ingot", "cobalt sheet"),
+    "copper ore": ("copper powder", "copper ingot", "copper sheet"),
+    "gold ore": ("gold powder", "gold ingot", "gold sheet"),
+    "iron ore": ("iron powder", "iron ingot", "steel"),
+    "lead ore": ("lead powder", "lead ingot", "lead sheet"),
+    "platinum ore": ("platinum powder", "platinum ingot", "platinum sheet"),
+    "silver ore": ("silver powder", "silver ingot", "silver sheet"),
+    "titanium ore": ("titanium powder", "titanium ingot", "titanium sheet"),
+    "tungsten ore": ("tungsten powder", "tungsten ingot", "tungsten sheet"),
+    "uranium ore": ("uranium powder", None, None),
+    "zinc ore": ("zinc powder", "zinc ingot", "zinc sheet"),
+}
+
+CRYSTAL_PROCESSING_CHAINS = {
+    "alexandrite crystal": ("alexandrite powder", "alexandrite", "alexandrite lens"),
+    "asbestos crystal": ("asbestos powder", None, None),
+    "beryllium crystal": ("beryllium powder", None, None),
+    "cinnabar crystal": ("cinnabar powder", None, None),
+    "coltan crystal": ("coltan powder", None, None),
+    "emerald crystal": ("emerald powder", "emerald", "emerald lens"),
+    "fluorite crystal": ("fluorite powder", None, None),
+    "laxanite crystal": ("laxanite powder", None, None),
+    "laytoite crystal": ("laytoite powder", None, None),
+    "phosphorus crystal": ("phosphorus powder", None, None),
+    "quartz crystal": ("quartz powder", None, None),
+    "rough diamond crystal": ("diamond dust", "diamond", "diamond lens"),
+    "ruby crystal": ("ruby powder", "ruby", "ruby lens"),
+    "saltpeter crystal": ("saltpeter powder", None, None),
+    "trimorid crystal": ("trimorid powder", None, None),
 }
 
 # These are the actual per-fluid-unit values consumed by PricingSystem.  Keep
@@ -101,6 +140,16 @@ class Route:
     old_payout: float
 
 
+@dataclass(frozen=True)
+class LiveRecipe:
+    """A consumed-input/output batch read from the current prototype YAML."""
+
+    id: str
+    machine: str
+    inputs: tuple[InputItem, ...]
+    outputs: tuple[InputItem, ...]
+
+
 def clean(value: str | None) -> str:
     return re.sub(r"\s+", " ", value or "").strip()
 
@@ -126,6 +175,216 @@ def key(value: str) -> str:
 
 def product_display_name(value: str) -> str:
     return SELLABLE_FLUID_DISPLAY_NAMES.get(key(value), value)
+
+
+def yaml_scalar(block: str, field: str) -> str | None:
+    prefix = r"- " if field == "type" else r"  "
+    match = re.search(rf"^{prefix}{re.escape(field)}:\s*(.*?)\s*$", block, flags=re.MULTILINE)
+    if not match:
+        return None
+    value = re.sub(r"\s+#.*$", "", match.group(1)).strip()
+    if len(value) >= 2 and value[0] == value[-1] and value[0] in "\"'":
+        value = value[1:-1]
+    return value or None
+
+
+def yaml_mapping(block: str, field: str) -> list[tuple[str, float]]:
+    """Read the simple scalar dictionaries used by RUMC recipe prototypes."""
+    inline = re.search(rf"^  {re.escape(field)}:\s*\{{(.*?)\}}\s*$", block, flags=re.MULTILINE)
+    if inline:
+        result = []
+        for entry in inline.group(1).split(","):
+            if ":" not in entry:
+                continue
+            item, amount = entry.split(":", 1)
+            result.append((item.strip(), float(amount.strip())))
+        return result
+
+    header = re.search(rf"^  {re.escape(field)}:\s*$", block, flags=re.MULTILINE)
+    if not header:
+        return []
+    result = []
+    for line in block[header.end():].splitlines():
+        if line and not line.startswith("    "):
+            break
+        match = re.match(r"^    ([^:#][^:]*):\s*([-+]?[0-9]+(?:\.[0-9]+)?)\s*(?:#.*)?$", line)
+        if match:
+            result.append((match.group(1).strip(), float(match.group(2))))
+    return result
+
+
+def extract_live_recipes(
+    prices: dict[str, float],
+) -> tuple[list[LiveRecipe], dict[str, int], dict[str, dict[str, set[str]]]]:
+    """Read current assembly/fabricator recipes with their real batch quantities.
+
+    These two prototype families account for nearly every modern RUMC production
+    recipe. Reading them directly prevents a stale catalog baseline from pricing
+    a wrench (or any other manufactured item) below its current material cost.
+    """
+    blocks: dict[tuple[str, str], str] = {}
+    roots = (ROOT / "Resources" / "Prototypes", ROOT / "Content.CMU" / "Resources" / "Prototypes")
+    for root in roots:
+        for path in root.rglob("*.yml"):
+            text = path.read_text(encoding="utf-8")
+            for block in re.split(r"(?=^- type: )", text, flags=re.MULTILINE):
+                prototype_type = yaml_scalar(block, "type")
+                prototype_id = yaml_scalar(block, "id")
+                if prototype_type and prototype_id:
+                    blocks[(prototype_type, prototype_id)] = block
+
+    entity_blocks = {prototype_id: block for (prototype_type, prototype_id), block in blocks.items()
+        if prototype_type == "entity"}
+    stack_blocks = {prototype_id: block for (prototype_type, prototype_id), block in blocks.items()
+        if prototype_type == "stack"}
+    reagent_blocks = {prototype_id: block for (prototype_type, prototype_id), block in blocks.items()
+        if prototype_type == "reagent"}
+
+    locale: dict[str, str] = {}
+    for locale_root in (ROOT / "Resources" / "Locale" / "en-US",
+                        ROOT / "Content.CMU" / "Resources" / "Locale" / "en-US"):
+        for path in locale_root.rglob("*.ftl"):
+            for match in re.finditer(r"^([A-Za-z0-9_.-]+)\s*=\s*([^\n{]+?)\s*$",
+                                     path.read_text(encoding="utf-8"), flags=re.MULTILINE):
+                locale[match.group(1)] = match.group(2).strip()
+
+    name_overrides = {
+        "CMSteel": "Steel",
+        "CMGlass": "Glass",
+        "CMGlassReinforced": "Glass Reinforced",
+        "CMRodMetal": "Rod Metal",
+        "RMCWood": "Wood",
+        "RUMCChromeIngot": "chromium ingot",
+        "CMUThinCableLV": "Uthin Cable Lv",
+        "CableMV": "Cable Mv",
+        "CableHV": "Cable Hv",
+        "RUMCElectricScrewdriver": "Electric Screwdriver",
+        "RUMCElectricWrench": "Electric Wrench",
+        "RUMCElectricWirecutters": "Electric Wirecutters",
+        "RUMCElectricCrowbar": "Electric Crowbar",
+        "RUMCElectricHammer": "Electric Hammer",
+        "RUMCPowerDrill": "Power Drill",
+        "RUMCElectricShovel": "Electric Shovel",
+        "RUMCElectricPickaxe": "Electric Pickaxe",
+        "RUMCProspector": "Prospector",
+        "RUMCJackhammer": "Jackhammer",
+        "RMCPouchGeneralLarge": "large general pouch",
+    }
+
+    resolved_entities: dict[str, str | None] = {}
+
+    def entity_name(prototype_id: str, seen: set[str] | None = None) -> str | None:
+        if prototype_id in resolved_entities:
+            return resolved_entities[prototype_id]
+        if seen is None:
+            seen = set()
+        if prototype_id in seen:
+            return None
+        seen.add(prototype_id)
+        block = entity_blocks.get(prototype_id)
+        if block is None:
+            resolved_entities[prototype_id] = None
+            return None
+        name = yaml_scalar(block, "name")
+        if name is None:
+            parent = yaml_scalar(block, "parent")
+            parents: list[str] = []
+            if parent:
+                if parent.startswith("[") and parent.endswith("]"):
+                    parents.extend(item.strip() for item in parent[1:-1].split(",") if item.strip())
+                else:
+                    parents.append(parent)
+            else:
+                parent_block = re.search(r"^  parent:\s*$", block, flags=re.MULTILINE)
+                if parent_block:
+                    for line in block[parent_block.end():].splitlines():
+                        match = re.match(r"^  -\s*([^#\s]+)", line)
+                        if not match:
+                            break
+                        parents.append(match.group(1))
+            for parent_id in parents:
+                name = entity_name(parent_id, seen)
+                if name:
+                    break
+        resolved_entities[prototype_id] = name
+        return name
+
+    def stack_name(prototype_id: str) -> str | None:
+        block = stack_blocks.get(prototype_id)
+        if block is None:
+            return None
+        return yaml_scalar(block, "name") or entity_name(yaml_scalar(block, "spawn") or "")
+
+    def reagent_name(prototype_id: str) -> str | None:
+        block = reagent_blocks.get(prototype_id)
+        return yaml_scalar(block, "name") if block else None
+
+    def material(prototype_id: str, amount: float, kind: str, output: bool = False) -> InputItem | None:
+        name = name_overrides.get(prototype_id) or (stack_name(prototype_id) if kind == "stack" else
+            entity_name(prototype_id) if kind == "entity" else reagent_name(prototype_id))
+        if not name:
+            return None
+        candidates = [name]
+        if name in locale:
+            candidates.append(locale[name])
+        resolved = next((candidate for candidate in candidates if key(candidate) in prices), candidates[-1])
+        if kind == "fluid" and output and key(resolved) not in prices:
+            return None
+        return InputItem(amount, resolved, key(resolved))
+
+    recipes: list[LiveRecipe] = []
+    skipped = Counter()
+    bindings: dict[str, dict[str, set[str]]] = defaultdict(lambda: {"stack": set(), "entity": set()})
+    for (prototype_type, prototype_id), block in blocks.items():
+        if prototype_type == "cmuMachineRecipe":
+            machine = yaml_scalar(block, "machine") or ""
+            if machine.casefold() == "recycler":
+                skipped["recycler"] += 1
+                continue
+            raw_inputs = [
+                *((item, amount, "stack") for item, amount in yaml_mapping(block, "inputs")),
+                *((item, amount, "entity") for item, amount in yaml_mapping(block, "itemInputs")),
+                *((item, amount, "fluid") for item, amount in yaml_mapping(block, "fluidInputs")),
+            ]
+            raw_outputs = [
+                *((item, amount, "stack") for item, amount in yaml_mapping(block, "outputs")),
+                *((item, amount, "entity") for item, amount in yaml_mapping(block, "itemOutputs")),
+                *((item, amount, "fluid") for item, amount in yaml_mapping(block, "fluidOutputs")),
+            ]
+        elif prototype_type == "cmuAssemblyRecipe":
+            machine = "assembly"
+            raw_inputs = []
+            layout = re.search(r"^  layout:\s*$", block, flags=re.MULTILINE)
+            if layout:
+                for line in block[layout.end():].splitlines():
+                    if line and not line.startswith("    "):
+                        break
+                    match = re.match(
+                        r"^    \d+:\s*\{\s*material:\s*([^, }]+),\s*amount:\s*([0-9.]+)\s*\}\s*$",
+                        line,
+                    )
+                    if match:
+                        raw_inputs.append((match.group(1), float(match.group(2)), "stack"))
+            result = yaml_scalar(block, "result")
+            raw_outputs = [(result, float(yaml_scalar(block, "resultAmount") or 1), "entity")] if result else []
+        else:
+            continue
+
+        inputs = tuple(material(item, amount, kind) for item, amount, kind in raw_inputs)
+        resolved_outputs = [material(item, amount, kind, output=True) for item, amount, kind in raw_outputs]
+        if not raw_inputs or any(item is None for item in inputs):
+            skipped["unresolved input"] += 1
+            continue
+        outputs = tuple(item for item in resolved_outputs if item is not None)
+        if not outputs:
+            skipped[f"unresolved output ({prototype_id})"] += 1
+            continue
+        for (prototype_id, _, kind), output in zip(raw_outputs, resolved_outputs):
+            if output is not None and kind in {"stack", "entity"}:
+                bindings[output.key][kind].add(prototype_id)
+        recipes.append(LiveRecipe(prototype_id, machine, inputs, outputs))  # type: ignore[arg-type]
+
+    return recipes, dict(skipped), dict(bindings)
 
 
 def number(value: str | None) -> float:
@@ -508,6 +767,258 @@ def apply_balance_revision(
     return revised, revised_bases, rules
 
 
+def apply_processing_floors(
+    prices: dict[str, float],
+    external_bases: dict[str, float],
+    rules: dict[str, str],
+) -> tuple[dict[str, float], dict[str, float], dict[str, str]]:
+    """Keep every primary raw-to-processed batch value-positive.
+
+    The balance multipliers are applied first. These floors then repair stage
+    inversions caused by independently reducing raw and processed products.
+    Waste/byproduct values are deliberately small so separators and refiners do
+    not destroy export value merely by recovering useful material from stone.
+    """
+    revised = dict(prices)
+    revised_rules = dict(rules)
+
+    def set_exact(product: str, value: float, reason: str) -> None:
+        product_key = key(product)
+        if product_key not in revised:
+            return
+        revised[product_key] = value
+        revised_rules[product_key] = reason
+
+    def set_floor(product: str, value: float, reason: str) -> None:
+        product_key = key(product)
+        if product_key not in revised:
+            return
+        floor = round_price(value)
+        if revised[product_key] + 1e-9 >= floor:
+            return
+        revised[product_key] = floor
+        revised_rules[product_key] = reason
+
+    # Low-stage stone products are recoverable waste, not premium feedstock.
+    set_exact("stone fragment", 0.25, "raw/waste correction")
+    set_exact("black stone fragment", 0.25, "raw/waste correction")
+    set_exact("stone powder", 0.5, "separator-compatible waste value")
+    set_exact("black stone powder", 0.5, "separator-compatible waste value")
+    set_exact("sand", 1.5, "sifted raw-material value")
+    set_exact("raw rubber", 50.0, "extracted raw-material correction")
+
+    stone_powder = revised[key("stone powder")]
+    coke = revised.get(key("coke"), 0.0)
+
+    for raw, (powder, ingot, sheet) in METAL_PROCESSING_CHAINS.items():
+        raw_key = key(raw)
+        powder_key = key(powder)
+        if raw_key not in revised or powder_key not in revised:
+            continue
+
+        # The appraiser is per unit: one powder must exceed one raw ore, even
+        # though a grinder also produces several powder units per ore.
+        set_floor(powder, revised[raw_key] * PROCESSING_MARGIN, "raw-to-powder unit floor")
+
+        if ingot is None or key(ingot) not in revised:
+            continue
+        powder_batch = 3 * revised[powder_key]
+        if raw == "iron ore":
+            powder_batch += coke
+        ingot_floor = max(revised[raw_key], powder_batch) * PROCESSING_MARGIN
+        set_floor(ingot, ingot_floor, "ore-to-ingot processing floor")
+
+        if sheet is not None and key(sheet) in revised:
+            set_floor(sheet, revised[key(ingot)] * PROCESSING_MARGIN, "ingot-to-sheet processing floor")
+
+    for raw, (powder, gem, lens) in CRYSTAL_PROCESSING_CHAINS.items():
+        raw_key = key(raw)
+        powder_key = key(powder)
+        if raw_key not in revised or powder_key not in revised:
+            continue
+
+        set_floor(powder, revised[raw_key] * PROCESSING_MARGIN, "crystal-to-powder unit floor")
+
+        if gem is not None and key(gem) in revised:
+            # Sifting yields one gem, one powder and one stone powder. The gem
+            # remains the high-value stage even when compared per unit.
+            gem_floor = max(revised[raw_key], revised[powder_key]) * PROCESSING_MARGIN
+            set_floor(gem, gem_floor, "sifted-gem unit floor")
+            if lens is not None and key(lens) in revised:
+                set_floor(lens, revised[key(gem)] * PROCESSING_MARGIN, "gem-to-lens unit floor")
+
+    set_floor("rubber sheet", revised[key("raw rubber")] * PROCESSING_MARGIN,
+        "raw-rubber processing floor")
+    # The wiremill yields two fine wires per ingot. Keep both precious-metal
+    # routes profitable after their ingot floors move upward.
+    set_floor("fine gold wire", revised[key("gold ingot")] * PROCESSING_MARGIN / 2,
+        "gold-ingot wire batch floor")
+    set_floor("fine silver wire", revised[key("silver ingot")] * PROCESSING_MARGIN / 2,
+        "silver-ingot wire batch floor")
+
+    revised_bases = {
+        raw_key: revised.get(raw_key, value)
+        for raw_key, value in external_bases.items()
+    }
+    validate_processing_floors(revised)
+    return revised, revised_bases, revised_rules
+
+
+def validate_processing_floors(prices: dict[str, float]) -> None:
+    """Fail generation if a primary processing stage loses canonical ASRS value."""
+    failures: list[str] = []
+    stone = prices[key("stone powder")]
+
+    for raw, (powder, ingot, sheet) in METAL_PROCESSING_CHAINS.items():
+        if key(raw) not in prices or key(powder) not in prices:
+            continue
+        raw_value = prices[key(raw)]
+        powder_value = prices[key(powder)]
+        if powder_value <= raw_value:
+            failures.append(f"{raw} -> {powder} per unit")
+        if 3 * powder_value + 2 * stone <= raw_value:
+            failures.append(f"{raw} -> {powder}")
+        if ingot is not None and key(ingot) in prices:
+            ingot_value = prices[key(ingot)]
+            blast_inputs = 3 * powder_value + (prices.get(key("coke"), 0.0) if raw == "iron ore" else 0.0)
+            if ingot_value <= raw_value or ingot_value <= blast_inputs:
+                failures.append(f"{raw}/{powder} -> {ingot}")
+            if sheet is not None and key(sheet) in prices and prices[key(sheet)] <= ingot_value:
+                failures.append(f"{ingot} -> {sheet}")
+
+    for raw, (powder, gem, lens) in CRYSTAL_PROCESSING_CHAINS.items():
+        if key(raw) not in prices or key(powder) not in prices:
+            continue
+        raw_value = prices[key(raw)]
+        powder_value = prices[key(powder)]
+        if powder_value <= raw_value:
+            failures.append(f"{raw} -> {powder} per unit")
+        if 3 * powder_value + 2 * stone <= raw_value:
+            failures.append(f"{raw} -> {powder}")
+        if gem is not None and key(gem) in prices:
+            gem_value = prices[key(gem)]
+            if gem_value <= raw_value or gem_value <= powder_value:
+                failures.append(f"{raw}/{powder} -> {gem} per unit")
+            if gem_value + powder_value + stone <= raw_value:
+                failures.append(f"{raw} -> {gem}")
+            if lens is not None and key(lens) in prices:
+                if prices[key(lens)] <= gem_value:
+                    failures.append(f"{gem} -> {lens} per unit")
+                if 2 * prices[key(lens)] <= gem_value:
+                    failures.append(f"{gem} -> {lens} batch")
+
+    if prices[key("rubber sheet")] <= prices[key("raw rubber")]:
+        failures.append("raw rubber -> rubber sheet")
+    if stone <= prices[key("stone fragment")]:
+        failures.append("stone fragment -> stone powder per unit")
+    if prices[key("black stone powder")] <= prices[key("black stone fragment")]:
+        failures.append("black stone fragment -> black stone powder per unit")
+    if 4 * prices[key("sand")] <= 4 * stone:
+        failures.append("stone powder -> sand")
+    if 3 * prices[key("glass")] <= 4 * prices[key("sand")]:
+        failures.append("sand -> glass")
+    if prices[key("silicon ingot")] <= 3 * prices[key("sand")] + prices[key("coke")]:
+        failures.append("sand/coke -> silicon ingot")
+    if 2 * prices[key("fine gold wire")] <= prices[key("gold ingot")]:
+        failures.append("gold ingot -> fine gold wire")
+    if 2 * prices[key("fine silver wire")] <= prices[key("silver ingot")]:
+        failures.append("silver ingot -> fine silver wire")
+
+    if failures:
+        raise RuntimeError("Processing price inversions: " + ", ".join(failures))
+
+
+def apply_live_recipe_floors(
+    prices: dict[str, float],
+    rules: dict[str, str],
+) -> tuple[
+    dict[str, float],
+    dict[str, str],
+    dict[str, str],
+    dict[str, dict[str, set[str]]],
+    int,
+    int,
+    dict[str, int],
+]:
+    """Make current assembly/fabricator batches worth 10% more than their inputs.
+
+    The first declared output is the recipe's primary product. Co-products retain
+    their own prices and offset the amount that must be carried by that primary
+    product. When several recipes make the same product, only the cheapest valid
+    route establishes its floor.
+    """
+    revised = dict(prices)
+    revised_rules = dict(rules)
+    recipes, skipped, bindings = extract_live_recipes(revised)
+    live_names = {item.key: item.name for recipe in recipes for item in recipe.outputs}
+    adjusted: set[str] = set()
+
+    def split_outputs(recipe: LiveRecipe) -> tuple[InputItem, tuple[InputItem, ...]]:
+        # Prototype dictionaries do not consistently put the intended product
+        # first. Use the most valuable pre-floor output as the primary product;
+        # this keeps recovered stone or slag byproducts from carrying a batch.
+        primary_index = max(range(len(recipe.outputs)), key=lambda index: prices.get(recipe.outputs[index].key, 0.0))
+        primary = recipe.outputs[primary_index]
+        coproducts = tuple(item for index, item in enumerate(recipe.outputs) if index != primary_index)
+        return primary, coproducts
+
+    last_changes: list[str] = []
+    for _ in range(80):
+        candidates: dict[str, list[tuple[float, LiveRecipe]]] = defaultdict(list)
+        for recipe in recipes:
+            primary, coproducts = split_outputs(recipe)
+            # Beneficiation recipes return their primary input unchanged and add
+            # a recovered co-product. Pricing the unchanged material at +10%
+            # would create a self-referential inflation loop.
+            if any(item.key == primary.key for item in recipe.inputs):
+                continue
+            if any(item.key not in revised for item in recipe.inputs):
+                continue
+            input_value = sum(item.quantity * revised[item.key] for item in recipe.inputs)
+            coproduct_value = sum(item.quantity * revised.get(item.key, 0.0) for item in coproducts)
+            required_primary = max(0.5, (input_value * PROCESSING_MARGIN - coproduct_value) / primary.quantity)
+            candidates[primary.key].append((required_primary, recipe))
+
+        changed = False
+        last_changes = []
+        for product_key, product_candidates in candidates.items():
+            required, recipe = min(product_candidates, key=lambda item: item[0])
+            floor = round_price(required)
+            if revised.get(product_key, 0.0) + 1e-9 >= floor:
+                continue
+            revised[product_key] = floor
+            revised_rules[product_key] = f"live recipe floor ({recipe.machine}: {recipe.id})"
+            adjusted.add(product_key)
+            last_changes.append(f"{product_key}={floor:g} via {recipe.id}")
+            changed = True
+        if not changed:
+            break
+    else:
+        raise RuntimeError("Live recipe price floors did not converge after 80 passes; last changes: " +
+            ", ".join(last_changes))
+
+    failures = []
+    candidates: dict[str, list[tuple[float, LiveRecipe]]] = defaultdict(list)
+    for recipe in recipes:
+        primary, coproducts = split_outputs(recipe)
+        if any(item.key == primary.key for item in recipe.inputs):
+            continue
+        if any(item.key not in revised for item in recipe.inputs):
+            continue
+        input_value = sum(item.quantity * revised[item.key] for item in recipe.inputs)
+        coproduct_value = sum(item.quantity * revised.get(item.key, 0.0) for item in coproducts)
+        required_primary = max(0.5, (input_value * PROCESSING_MARGIN - coproduct_value) / primary.quantity)
+        candidates[primary.key].append((required_primary, recipe))
+    for product_key, product_candidates in candidates.items():
+        required, recipe = min(product_candidates, key=lambda item: item[0])
+        if revised[product_key] + 1e-9 < required:
+            failures.append(f"{recipe.id}: {product_key} {revised[product_key]:g} < {required:g}")
+    if failures:
+        raise RuntimeError("Live recipe price inversions: " + ", ".join(failures))
+
+    return revised, revised_rules, live_names, bindings, len(recipes), len(adjusted), skipped
+
+
 def build_pdf(
     path: Path,
     routes: list[Route],
@@ -518,6 +1029,7 @@ def build_pdf(
     components: dict[str, tuple[float, float]],
     baseline_prices: dict[str, float],
     balance_rules: dict[str, str],
+    live_names: dict[str, str],
     excluded_products: set[str],
 ) -> None:
     page_size = landscape(letter)
@@ -542,7 +1054,7 @@ def build_pdf(
         canvas.saveState()
         canvas.setFillColor(colors.HexColor("#53616A"))
         canvas.setFont("Helvetica", 6.5)
-        canvas.drawString(margin, 0.23 * inch, "RUMC canonical pricing - raw and processed balance pass - 2026-11-18")
+        canvas.drawString(margin, 0.23 * inch, "RUMC canonical pricing - raw and processed balance pass - 2026-11-22")
         canvas.drawRightString(width - margin, 0.23 * inch, f"Page {document.page}")
         canvas.restoreState()
 
@@ -615,7 +1127,7 @@ def build_pdf(
         Paragraph("One product prototype, one price", subtitle),
         Spacer(1, 0.18 * inch),
         Paragraph(
-                "Every product keeps one prototype price regardless of its production route. This revision halves raw ore and crystal values, reduces processed and other products to 75% of their prior canonical values, and moves the high-value gemstone tier from rough crystals to sifted gems.",
+                "Every product keeps one prototype price regardless of its production route. This revision halves raw ore and crystal values, reduces processed and other products to 75% of their prior canonical values, moves the high-value gemstone tier from rough crystals to sifted gems, and applies live recipe-cost floors so manufactured batches cannot be worth less than their consumed materials.",
             ParagraphStyle("Lead", parent=subtitle, fontSize=11, leading=16),
         ),
         Spacer(1, 0.28 * inch),
@@ -675,6 +1187,10 @@ def build_pdf(
                 "6. Balance multiplication is retained to two decimal places. Import value remains 1.5 times the final canonical price using the catalog's import rounding rule.",
                 body,
             ),
+            Paragraph(
+                "7. Processing floor: every primary processed unit is worth more than its raw unit. Current assembly and fabricator recipes also receive a 10% complete-batch margin using their cheapest valid route; co-products contribute to the same batch instead of being charged the full input cost individually.",
+                body,
+            ),
             Spacer(1, 0.08 * inch),
             Paragraph("Formula", heading),
         ]
@@ -684,6 +1200,7 @@ def build_pdf(
         [Paragraph("Raw ore or crystal", cell), Paragraph("P(new) = 0.50 x P(previous)", cell)],
         [Paragraph("Processed / other product", cell), Paragraph("P(new) = 0.75 x P(previous)", cell)],
         [Paragraph("Refined gemstone", cell), Paragraph("P(new) = 0.75 x P(previous rough crystal)", cell)],
+        [Paragraph("Live manufactured batch", cell), Paragraph("P(outputs) >= 1.10 x P(consumed inputs)", cell)],
         [Paragraph("Import price", cell), Paragraph("I(product) = round up(1.5 x P(new))", cell)],
     ]
     formula_table = Table(formula_data, colWidths=[2.25 * inch, 5.25 * inch], repeatRows=1)
@@ -740,6 +1257,7 @@ def build_pdf(
         routes_by_output[route.output_key].append(route)
 
     catalog_rows = []
+    catalog_keys: set[str] = set()
     for output_key, route in best_route.items():
         if output_key in excluded_products:
             continue
@@ -755,6 +1273,21 @@ def build_pdf(
         import_price = round_price(sale * 1.5)
         reference = "Raw resource base" if output_key in external_bases else f"{route.machine}: {route.route}"
         catalog_rows.append((category, output_name, baseline_prices[output_key], balance_rules[output_key], sale, import_price, reference))
+        catalog_keys.add(output_key)
+
+    for output_key, output_name in live_names.items():
+        if output_key in catalog_keys or output_key in excluded_products or output_key not in prices:
+            continue
+        sale = prices[output_key]
+        catalog_rows.append((
+            "Other manufactured goods",
+            output_name,
+            baseline_prices.get(output_key, 0.0),
+            balance_rules.get(output_key, "live recipe floor"),
+            sale,
+            round_price(sale * 1.5),
+            "Current RUMC recipe prototype",
+        ))
 
     catalog_rows.sort(key=lambda item: (CATEGORY_PRIORITY.get(item[0], 999), item[1].casefold()))
     catalog_data = [[
@@ -799,7 +1332,7 @@ def build_pdf(
                 body,
             ),
             Paragraph(
-                "This document records the 2026-11-18 raw-versus-processed balance reduction. It is the canonical price schedule used by ASRS appraisal for RUMC output prototypes.",
+                "This document records the 2026-11-22 raw-versus-processed balance reduction. It is the canonical price schedule used by ASRS appraisal for RUMC output prototypes.",
                 body,
             ),
         ]
@@ -814,6 +1347,8 @@ def write_price_prototypes(
     prices: dict[str, float],
     external_bases: dict[str, float],
     display_names: dict[str, str],
+    live_names: dict[str, str],
+    live_bindings: dict[str, dict[str, set[str]]],
     excluded_products: set[str],
 ) -> int:
     products: dict[str, tuple[str, float]] = {}
@@ -832,21 +1367,30 @@ def write_price_prototypes(
             continue
         products[raw_key] = (display_names[raw_key], raw_price)
 
+    for product_key, product_name in live_names.items():
+        if product_key in prices and product_key not in excluded_products:
+            products[product_key] = (product_name, prices[product_key])
+
     lines = [
         "# Generated by Tools/generate_rumc_canonical_pricing_pdf.py.",
         "# One entry per canonical product display name; raw bases and processed goods share this registry.",
         "",
     ]
-    for index, (_, (product_name, price)) in enumerate(sorted(products.items()), 1):
-        lines.extend(
-            [
-                "- type: cmuIndustryPrice",
-                f"  id: RUMCIndustryPrice{index:03d}",
-                f"  product: {json.dumps(product_name, ensure_ascii=True)}",
-                f"  price: {yaml_number(price)}",
-                "",
-            ]
-        )
+    for index, (product_key, (product_name, price)) in enumerate(sorted(products.items()), 1):
+        lines.extend([
+            "- type: cmuIndustryPrice",
+            f"  id: RUMCIndustryPrice{index:03d}",
+            f"  product: {json.dumps(product_name, ensure_ascii=True)}",
+            f"  price: {yaml_number(price)}",
+        ])
+        binding = live_bindings.get(product_key, {})
+        stacks = sorted(binding.get("stack", set()))
+        entities = sorted(binding.get("entity", set()))
+        if stacks:
+            lines.append(f"  stacks: {json.dumps(stacks)}")
+        if entities:
+            lines.append(f"  entities: {json.dumps(entities)}")
+        lines.append("")
 
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
@@ -886,15 +1430,22 @@ def main() -> None:
         if fluid_key in external_bases:
             external_bases[fluid_key] = previous_price
     prices, external_bases, balance_rules = apply_balance_revision(baseline_prices, external_bases, display_names)
+    prices, external_bases, balance_rules = apply_processing_floors(prices, external_bases, balance_rules)
+    prices, balance_rules, live_names, live_bindings, live_recipe_count, adjusted_count, skipped_live = (
+        apply_live_recipe_floors(prices, balance_rules)
+    )
+    external_bases = {raw_key: prices.get(raw_key, value) for raw_key, value in external_bases.items()}
     excluded_products = capital_machine_names()
     build_pdf(PDF_PATH, routes, prices, external_bases, display_names, best_route, components,
-        baseline_prices, balance_rules, excluded_products)
-    price_count = write_price_prototypes(PRICES_PATH, routes, prices, external_bases, display_names, excluded_products)
+        baseline_prices, balance_rules, live_names, excluded_products)
+    price_count = write_price_prototypes(
+        PRICES_PATH, routes, prices, external_bases, display_names, live_names, live_bindings, excluded_products)
     print(f"Wrote {PDF_PATH}")
     print(f"Raw bases: {sum(primary_raw_key(display_names[k]) for k in external_bases if k in display_names)}")
     print(f"Canonical products: {len(best_route)}")
     print(f"Capital machinery excluded: {sum(name in best_route for name in excluded_products)}")
     print(f"Runtime prices: {price_count}")
+    print(f"Live priced recipes: {live_recipe_count}; adjusted products: {adjusted_count}; skipped: {skipped_live}")
 
 
 if __name__ == "__main__":

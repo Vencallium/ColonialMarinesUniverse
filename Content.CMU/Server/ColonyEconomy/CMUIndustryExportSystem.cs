@@ -73,6 +73,23 @@ public sealed partial class CMUIndustryExportSystem : EntitySystem
                 _entityPrices[prototype.ID] = price;
         }
 
+        // Generated explicit bindings override display-name matching. Some legacy
+        // stacks use generic names such as "metal" while the industry catalog
+        // intentionally exposes the material as "Steel".
+        foreach (var price in ProtoMan.EnumeratePrototypes<CMUIndustryPricePrototype>())
+        {
+            foreach (var stackId in price.Stacks)
+            {
+                _stackPrices[stackId] = price.Price;
+                var stack = ProtoMan.Index(stackId);
+                if (!string.IsNullOrWhiteSpace(stack.Spawn.Id))
+                    _entityPrices[stack.Spawn] = price.Price;
+            }
+
+            foreach (var entityId in price.Entities)
+                _entityPrices[entityId] = price.Price;
+        }
+
         Log.Info($"Loaded {_namePrices.Count} canonical RUMC prices; resolved {_stackPrices.Count} stacks and {_entityPrices.Count} entities.");
     }
 
@@ -135,21 +152,18 @@ public sealed partial class CMUIndustryExportSystem : EntitySystem
 
     public bool CanExport(EntityUid uid)
     {
-        if (HasComp<ASRSSellableComponent>(uid))
-            return true;
+        if (!HasComp<ASRSSellableComponent>(uid))
+            return false;
 
         // A tank's marker only makes the container eligible for appraisal; its
         // contents must still be an allowed fuel/oil. This prevents refinery
         // gas, ethylene, water, and arbitrary reagents from becoming sellable
         // merely because they were poured into an industry tank.
         if (TryComp<FluidTankComponent>(uid, out var tank) && HasComp<FluidFillableComponent>(uid))
-            return tank.Contents.Keys.Any(ExportableFluids.Contains);
+            return tank.Contents.Count > 0 && tank.Contents.Keys.All(ExportableFluids.Contains);
 
-        if (HasComp<CMUIndustryExportComponent>(uid))
+        if (TryComp<SolutionManagerComponent>(uid, out var manager))
         {
-            if (!TryComp<SolutionManagerComponent>(uid, out var manager))
-                return true;
-
             foreach (var (_, solution) in _solutions.EnumerateSolutions((uid, manager)))
             {
                 foreach (var reagent in solution.Comp.Solution.Contents)
@@ -164,7 +178,7 @@ public sealed partial class CMUIndustryExportSystem : EntitySystem
             return true;
         }
 
-        return TryComp<StackComponent>(uid, out var stack) && GetTradePrice(stack) > 0;
+        return true;
     }
 
     /// <summary>Crates keep their fixed refund, with only industry exports paid on top.</summary>
