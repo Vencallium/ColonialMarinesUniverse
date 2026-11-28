@@ -74,23 +74,16 @@
   - !type:TraitsRequirement
     inverted: true
     traits:
-    - SocialAnxiety
-    - SocialAnxietyHeavy
-    - FrontalLisp
     - NonResuscitable
     - Epilepsy
     - CMUHeartCondition
     - CMUHemophilia
-    - CMUHardOfHearing
     - CMUClaustrophobic
     - CMUFearOfBlood
-    - CMUWeakThrow
-    - SlowRunner
     - Anemic
     - Asthmatic
     - CMUAlcoholic
     - CMUDrugAddict
-    - CMUBadLeg
   ranks:
     RMCRankCivilian: []
   chevrons:
@@ -172,6 +165,7 @@
   - CannedDrinksAU14
   - SmokablesRMC
   - GOVFORPlatCOSidearmBeltAU14
+  - CMUForceWeylandResetKeyCommand # EW Joe RB-40
 
 - type: startingGear
   id: AU14GearGOVFORPlatCoDummy

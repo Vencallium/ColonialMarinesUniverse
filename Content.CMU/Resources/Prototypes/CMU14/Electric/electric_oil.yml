@@ -188,6 +188,15 @@
 # The barrel that comes full of diesel.
 - type: entity
   parent: RUMCOilBarrel
+  id: CMUASRSCrudeOilBarrel
+  suffix: Crude oil, ASRS supply
+  components:
+  - type: FluidTank
+    contents:
+      RUMCCrudeOil: 800
+
+- type: entity
+  parent: RUMCOilBarrel
   id: RUMCOilBarrelDiesel
   suffix: Diesel
   components:
@@ -374,7 +383,7 @@
   - type: Sprite
     sprite: CMU14/Production/Oil/tower.rsi
     noRot: true
-    offset: 0,0.47
+    offset: 0.5,0.47
     layers:
     - state: off
       map: [ "off" ]
@@ -388,7 +397,7 @@
       fix1:
         shape:
           !type:PhysShapeAabb
-          bounds: "-0.45,-0.45,0.45,1.45"
+          bounds: "-0.45,-0.45,1.45,0.45"
         density: 190
         mask:
         - MachineMask
@@ -401,16 +410,18 @@
   - type: FluidTank
     capacity: 600
   - type: FluidPorts
-    connectionTiles: ["0,0", "0,1"]
+    connectionTiles: ["0,0", "1,0"]
     ports:
     - id: liquid_in
       rate: 30
     - id: crude_in
       kind: RUMCCrudeOil
       rate: 30
+      limit: 300
     - id: resin_in
       kind: RUMCResin
       rate: 12
+      limit: 120
     - id: naphtha_out
       kind: RUMCNaphtha
       output: true
@@ -425,6 +436,10 @@
       rate: 20
     - id: gas_out
       kind: RUMCRefineryGas
+      output: true
+      rate: 20
+    - id: benzene_out
+      kind: Benzene
       output: true
       rate: 20
   - type: RecipeMachine
@@ -469,12 +484,15 @@
     - id: light_in
       kind: RUMCLightFuel
       rate: 10
+      limit: 100
     - id: heavy_in
       kind: RUMCHeavyFuel
       rate: 10
+      limit: 100
     - id: naphtha_in
       kind: RUMCNaphtha
       rate: 10
+      limit: 60
   - type: RecipeMachine
     kind: blender
 
@@ -513,15 +531,22 @@
     - id: liquid_out
       output: true
       rate: 8
+    - id: ethylene_out
+      kind: RUMCEthylene
+      output: true
+      rate: 8
     - id: naphtha_in
       kind: RUMCNaphtha
       rate: 10
+      limit: 90
     - id: gas_in
       kind: RUMCRefineryGas
       rate: 10
+      limit: 120
     - id: water_in
       kind: Water
       rate: 10
+      limit: 90
   - type: RecipeMachine
     kind: cracker
 
@@ -563,9 +588,11 @@
     - id: ethylene_in
       kind: RUMCEthylene
       rate: 10
+      limit: 150
     - id: water_in
       kind: Water
       rate: 10
+      limit: 60
   - type: RecipeMachine
     kind: polymerizer
 

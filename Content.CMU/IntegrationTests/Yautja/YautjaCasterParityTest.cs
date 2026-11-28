@@ -75,6 +75,9 @@ public sealed class YautjaCasterParityTest
         var entMan = server.EntMan;
         var gun = entMan.GetComponent<GunComponent>(caster);
         gun.NextFire = server.ResolveDependency<IGameTiming>().CurTime;
+        // The unwielded caster scatters 10 degrees; at 20 tiles that moves a range-end blast past its radius.
+        gun.MinAngle = Angle.Zero;
+        gun.MaxAngle = Angle.Zero;
         gun.ShootCoordinates = target;
         var shot = entMan.System<SharedGunSystem>().AttemptShoot(hunter, (caster, gun));
         Assert.That(shot, Is.Not.Null.And.Count.EqualTo(1), "Test setup: the caster must fire.");
@@ -272,6 +275,13 @@ public sealed class YautjaCasterParityTest
             var entMan = server.EntMan;
             Floor(map, entMan, 30);
             var (hunter, caster) = ArmHunter(entMan, map.GridCoords.Offset(new Vector2(0.5f, 0.5f)), EradicatorMode);
+            // The real caster scatters shots by 10 degrees. Fix its aim for this
+            // range-end test so the bystander is always beside the detonation.
+            var gun = entMan.GetComponent<GunComponent>(caster);
+            gun.MinAngle = default;
+            gun.MaxAngle = default;
+            gun.CurrentAngle = default;
+            gun.AngleIncrease = default;
             // Off the bolt's line, where its 20-tile range runs out: only a range-end blast reaches them.
             bystander = entMan.SpawnEntity("CMMobHuman", map.GridCoords.Offset(new Vector2(20.5f, 2.5f)));
             Fire(server, hunter, caster, map.GridCoords.Offset(new Vector2(28.5f, 0.5f)));
